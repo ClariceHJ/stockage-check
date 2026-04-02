@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>충주공장 재고↔비재고 전환 모니터</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#2c2c2a;font-size:14px;line-height:1.6}
+.wrap{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;gap:12px;flex-wrap:wrap}
+.topbar h1{font-size:20px;font-weight:600;color:#1a1a18}
+.topbar .sub{font-size:13px;color:#888780;margin-top:2px}
+.upload-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid #ccc;border-radius:8px;font-size:13px;cursor:pointer;background:#fff;color:#2c2c2a;white-space:nowrap}
+.upload-btn:hover{background:#f0f0ee}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+@media(max-width:600px){.cards{grid-template-columns:repeat(2,1fr)}}
+.card{background:#fff;border-radius:8px;padding:1rem 1.2rem;border:1px solid #e8e8e5}
+.card .label{font-size:12px;color:#888780;margin-bottom:6px}
+.card .num{font-size:26px;font-weight:600}
+.card.flag .num{color:#A32D2D}
+.card.safe .num{color:#27500A}
+.card.watch .num{color:#633806}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.badge.to-non{background:#FCEBEB;color:#A32D2D}
+.badge.to-stock{background:#EAF3DE;color:#27500A}
+.badge.ok{background:#f1efe8;color:#5F5E5A}
+.badge.watch{background:#FAEEDA;color:#633806}
+.tag-row{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.tag-label{font-size:12px;color:#888780}
+.tag{font-size:12px;padding:4px 12px;border-radius:999px;border:1px solid #ddd;color:#888780;cursor:pointer;background:#fff}
+.tag:hover{background:#f5f5f3}
+.tag.active{border-color:#2c2c2a;color:#2c2c2a;background:#f0f0ee;font-weight:500}
+.tag.active-non{border-color:#E24B4A;color:#A32D2D;background:#FCEBEB;font-weight:500}
+.tag.active-stock{border-color:#639922;color:#27500A;background:#EAF3DE;font-weight:500}
+.tag.active-watch{border-color:#BA7517;color:#633806;background:#FAEEDA;font-weight:500}
+.tbl-wrap{background:#fff;border:1px solid #e8e8e5;border-radius:10px;overflow:auto;margin-bottom:1.5rem}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead th{text-align:left;padding:10px 12px;font-size:12px;font-weight:500;color:#888780;border-bottom:1px solid #e8e8e5;white-space:nowrap;background:#fafaf8}
+tbody tr{border-bottom:1px solid #f0f0ee}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#fafaf8}
+tbody td{padding:9px 12px;vertical-align:middle}
+.spark{display:flex;align-items:flex-end;gap:2px;height:22px}
+.spark span{display:inline-block;border-radius:1px;min-width:5px}
+.mono{font-family:'SF Mono',Consolas,monospace;font-size:12px}
+.empty{text-align:center;padding:4rem 2rem;color:#888780}
+.empty p{margin-bottom:0.5rem}
+.empty .hint{font-size:12px;color:#b4b2a9;line-height:1.8}
+.rules{background:#fff;border:1px solid #e8e8e5;border-radius:8px;padding:1rem 1.2rem;font-size:12px;color:#5F5E5A;line-height:2}
+.rules strong{color:#2c2c2a;font-weight:500}
+.sample-btn{margin-top:1rem;font-size:12px;padding:6px 16px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;color:#5F5E5A}
+.sample-btn:hover{background:#f5f5f3}
+.status-pill{font-size:12px;padding:2px 9px;border-radius:999px}
+.export-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1px solid #ccc;border-radius:8px;font-size:12px;cursor:pointer;background:#fff;color:#2c2c2a}
+.export-btn:hover{background:#f0f0ee}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>충주공장 재고↔비재고 전환 모니터</h1>
+      <div class="sub" id="last-update">데이터를 업로드해주세요</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="export-btn" onclick="exportCSV()" id="export-btn" style="display:none">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 11V1M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        결과 다운로드
+      </button>
+      <label class="upload-btn">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 5l4-4 4 4M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        CSV 업로드
+        <input type="file" accept=".csv" id="fileInput" style="display:none">
+      </label>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="label">전체 품목</div><div class="num" id="c-total">—</div></div>
+    <div class="card flag"><div class="label">비재고 전환 권고</div><div class="num" id="c-to-non">—</div></div>
+    <div class="card safe"><div class="label">재고 전환 권고</div><div class="num" id="c-to-stock">—</div></div>
+    <div class="card watch"><div class="label">모니터링 필요</div><div class="num" id="c-watch">—</div></div>
+  </div>
+
+  <div id="main-area">
+    <div class="empty">
+      <p>CSV 파일을 업로드하면 판정 결과가 표시됩니다</p>
+      <div class="hint">
+        필수 컬럼: 단품코드, 단품명, 운영상태(재고/비재고), 가용재고<br>
+        월별 출고량 컬럼명 예시: 2025년 1월, 2025년 2월 ... (6개월 이상)<br>
+        ERP에서 다운받은 파일을 그대로 올려주세요
+      </div>
+      <button class="sample-btn" onclick="loadSample()">샘플 데이터로 먼저 보기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let allData = [];
+let activeFilter = 'all';
+
+function judge(r) {
+  if (r.status === '재고'   && r.avg6 <= 8  && r.stock <= 5)  return 'to-non';
+  if (r.status === '비재고' && r.avg6 >= 12)                  return 'to-stock';
+  if (r.status === '재고'   && r.avg6 > 8   && r.avg6 < 10)   return 'watch';
+  if (r.status === '재고'   && r.avg6 <= 8  && r.stock > 5)   return 'watch';
+  if (r.status === '비재고' && r.peak >= 15)                   return 'watch';
+  return 'ok';
+}
+
+function badgeHtml(j) {
+  const map = {
+    'to-non':  '<span class="badge to-non">비재고 전환 권고</span>',
+    'to-stock':'<span class="badge to-stock">재고 전환 권고</span>',
+    'watch':   '<span class="badge watch">모니터링</span>',
+    'ok':      '<span class="badge ok">정상</span>',
+  };
+  return map[j] || '';
+}
+
+function sparkHtml(months) {
+  const max = Math.max(...months, 1);
+  return '<div class="spark">' + months.map(v => {
+    const h = Math.max(3, Math.round((v / max) * 22));
+    const col = v > 10 ? '#E24B4A' : v > 6 ? '#EF9F27' : '#85B7EB';
+    return `<span style="height:${h}px;background:${col};width:5px"></span>`;
+  }).join('') + '</div>';
+}
+
+function render(data) {
+  const filtered = activeFilter === 'all' ? data : data.filter(r => r.verdict === activeFilter);
+
+  document.getElementById('c-total').textContent    = data.length;
+  document.getElementById('c-to-non').textContent   = data.filter(r => r.verdict === 'to-non').length;
+  document.getElementById('c-to-stock').textContent = data.filter(r => r.verdict === 'to-stock').length;
+  document.getElementById('c-watch').textContent    = data.filter(r => r.verdict === 'watch').length;
+  document.getElementById('export-btn').style.display = data.length ? 'inline-flex' : 'none';
+
+  const counts = {
+    all:      data.length,
+    'to-non': data.filter(r=>r.verdict==='to-non').length,
+    'to-stock':data.filter(r=>r.verdict==='to-stock').length,
+    watch:    data.filter(r=>r.verdict==='watch').length,
+  };
+
+  function tagClass(f) {
+    if (activeFilter !== f) return 'tag';
+    if (f === 'all')      return 'tag active';
+    if (f === 'to-non')   return 'tag active-non';
+    if (f === 'to-stock') return 'tag active-stock';
+    if (f === 'watch')    return 'tag active-watch';
+    return 'tag active';
+  }
+
+  const rows = filtered.length === 0
+    ? `<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#888780">해당 항목이 없습니다</td></tr>`
+    : filtered.map(r => `
+      <tr>
+        <td class="mono">${r.code}</td>
+        <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.name}">${r.name}</td>
+        <td><span class="status-pill" style="background:${r.status==='재고'?'#E6F1FB':'#f1efe8'};color:${r.status==='재고'?'#0C447C':'#444441'}">${r.status}</span></td>
+        <td style="font-weight:500;color:${r.avg6>10?'#A32D2D':r.avg6>6?'#633806':'#2c2c2a'}">${r.avg6.toFixed(1)}</td>
+        <td>${r.peak}</td>
+        <td style="font-weight:500">${r.stock}</td>
+        <td>${sparkHtml(r.months)}</td>
+        <td>${badgeHtml(r.verdict)}</td>
+      </tr>`).join('');
+
+  document.getElementById('main-area').innerHTML = `
+    <div class="tag-row">
+      <span class="tag-label">필터</span>
+      <span class="${tagClass('all')}"      onclick="setFilter('all')">전체 (${counts.all})</span>
+      <span class="${tagClass('to-non')}"   onclick="setFilter('to-non')">비재고 전환 권고 (${counts['to-non']})</span>
+      <span class="${tagClass('to-stock')}" onclick="setFilter('to-stock')">재고 전환 권고 (${counts['to-stock']})</span>
+      <span class="${tagClass('watch')}"    onclick="setFilter('watch')">모니터링 (${counts.watch})</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>단품코드</th><th>단품명</th><th>운영상태</th>
+            <th>6개월 평균</th><th>최대월</th><th>가용재고</th>
+            <th>추이 (6개월)</th><th>판정</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="rules">
+      <strong>판정 기준</strong><br>
+      비재고 전환 권고: 현재 재고 운영 + 6개월 평균 ≤ 8개 + 가용재고 ≤ 5개<br>
+      재고 전환 권고: 현재 비재고 운영 + 6개월 평균 ≥ 12개<br>
+      모니터링: 경계 구간(평균 8~10개) 또는 비재고 운영 중 피크월 ≥ 15개
+    </div>`;
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  render(allData);
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    const vals = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = vals[i] || '');
+    return obj;
+  });
+}
+
+function processRows(rows) {
+  return rows.map(r => {
+    const monthKeys = Object.keys(r).filter(k => /\d{4}년/.test(k) || (/\d+월/.test(k) && !/단품/.test(k)));
+    const monthVals = monthKeys.map(k => parseFloat(r[k]) || 0);
+    const last6 = monthVals.slice(-6);
+    const avg6 = last6.length > 0 ? last6.reduce((a, b) => a + b, 0) / last6.length : 0;
+    const peak = Math.max(...monthVals, 0);
+    const stock = parseFloat(r['가용재고'] || r['재고수량'] || 0);
+    const status = (r['운영상태'] || r['TO BE'] || r['AS IS'] || '재고').trim();
+    const rec = {
+      code: r['단품코드'] || r['SKU'] || '',
+      name: r['단품명'] || r['품명'] || '',
+      status, avg6, peak, stock,
+      months: last6,
+      verdict: 'ok',
+      raw: r
+    };
+    rec.verdict = judge(rec);
+    return rec;
+  }).filter(r => r.code);
+}
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const rows = parseCSV(ev.target.result);
+    allData = processRows(rows);
+    activeFilter = 'all';
+    const now = new Date();
+    document.getElementById('last-update').textContent =
+      `마지막 업데이트: ${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}  |  ${file.name}`;
+    render(allData);
+  };
+  reader.readAsText(file, 'UTF-8');
+  e.target.value = '';
+});
+
+function exportCSV() {
+  const headers = ['단품코드','단품명','운영상태','6개월평균','최대월출고','가용재고','판정'];
+  const rows = allData.map(r => [
+    r.code, r.name, r.status,
+    r.avg6.toFixed(1), r.peak, r.stock,
+    {
+      'to-non':'비재고 전환 권고',
+      'to-stock':'재고 전환 권고',
+      'watch':'모니터링',
+      'ok':'정상'
+    }[r.verdict]
+  ]);
+  const csv = '\uFEFF' + [headers, ...rows].map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `충주_전환판정_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function loadSample() {
+  const sample = [
+    {code:'SLFC0150A-OCY',name:'아콘프레임 상판 Q',         status:'재고',  avg6:2.7, peak:5,  stock:14, months:[3,4,2,1,3,2]},
+    {code:'SLFE0110A-TL', name:'아몬드 바닥판A SS',          status:'재고',  avg6:11.9,peak:22, stock:8,  months:[13,10,12,11,14,12]},
+    {code:'SLFF0150A-NK', name:'버치 베이스 Q',              status:'비재고',avg6:3.2, peak:8,  stock:0,  months:[4,2,3,5,3,2]},
+    {code:'SLFN0110BR1-OCY',name:'아티초크 바닥판B SS',      status:'재고',  avg6:25.4,peak:44, stock:12, months:[25,22,28,24,27,26]},
+    {code:'SLFE0150A-NBK',name:'아몬드 바닥판A Q',           status:'재고',  avg6:4.1, peak:8,  stock:3,  months:[5,3,4,5,4,4]},
+    {code:'SLFF0110A-NK', name:'버치 베이스 SS',             status:'재고',  avg6:19.5,peak:27, stock:22, months:[18,20,22,19,21,17]},
+    {code:'SLFE0165A-TL', name:'아몬드 바닥판A K',           status:'비재고',avg6:13.2,peak:18, stock:0,  months:[12,14,13,15,12,13]},
+    {code:'SLFC0110R-WW', name:'아콘 속서랍 SS',             status:'재고',  avg6:17.6,peak:24, stock:18, months:[22,16,18,20,17,15]},
+    {code:'SLFE0034P-NWW',name:'아몬드 340패널 NWW',         status:'재고',  avg6:1.3, peak:4,  stock:2,  months:[2,1,1,2,0,2]},
+    {code:'SLFN0150FW-OCY',name:'아티초크 하부목재 Q',       status:'비재고',avg6:5.0, peak:10, stock:0,  months:[5,4,6,5,5,5]},
+  ].map(r => { r.verdict = judge(r); return r; });
+
+  allData = sample;
+  activeFilter = 'all';
+  document.getElementById('last-update').textContent = '샘플 데이터 표시 중';
+  document.getElementById('export-btn').style.display = 'inline-flex';
+  render(allData);
+}
+</script>
+</body>
+</html>
