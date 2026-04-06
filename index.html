@@ -196,6 +196,25 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 .cov-md { color: var(--warn); font-weight: 500; }
 .spark { display: flex; align-items: flex-end; gap: 2px; height: 22px; }
 .spark span { display: inline-block; border-radius: 2px; width: 5px; }
+.spark { position: relative; }
+.spark span { cursor: pointer; position: relative; }
+.spark span:hover::after {
+  content: attr(data-v);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
 .item-blocks { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 16px; }
 .item-block { background: var(--white); border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; height: 340px; display: flex; flex-direction: column; }
 .ib-head { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
@@ -534,11 +553,13 @@ function bdg(j) {
 
 function spark(months, cur) {
   const all = [...months, cur], max = Math.max(...all, 1);
+  const labels = [...Array(months.length).keys()].map(i => `D-${months.length-i}개월`);
+  labels.push('당월');
   return '<div class="spark">' + all.map((v,i) => {
     const h = Math.max(3, Math.round((v/max)*22));
     const isCur = i === all.length-1;
-    const c = isCur ? 'var(--text)' : (v>10 ? 'var(--danger)' : v>6 ? 'var(--warn)' : 'var(--accent)');
-    return `<span style="height:${h}px;background:${c};opacity:${isCur?1:.65}"></span>`;
+    const col = isCur ? 'var(--text)' : (v>10 ? 'var(--danger)' : v>6 ? 'var(--warn)' : 'var(--accent)');
+    return `<span style="height:${h}px;background:${col};opacity:${isCur?1:.65}" data-v="${labels[i]}: ${v}개"></span>`;
   }).join('') + '</div>';
 }
 
@@ -763,11 +784,18 @@ function renderList() {
     return activeFilter === f ? (m[f]||'chip') : 'chip';
   }
   const rows = !filtered.length
-    ? `<tr><td colspan="15" style="text-align:center;padding:3rem;color:var(--text3)">해당 항목 없음</td></tr>`
+    ? `<tr><td colspan="12" style="text-align:center;padding:3rem;color:var(--text3)">해당 항목 없음</td></tr>`
     : filtered.map(r => {
         const avgC = r.avg6>10?'n-danger':r.avg6>6?'n-warn':'fw6';
         const curC = r.당월출고>10?'n-danger':r.당월출고>6?'n-warn':'fw6';
-        const covC = r.cov>6?'cov-hi':r.cov>3?'cov-md':'';
+        const hasPolicy = r.운영방침 && r.운영방침 !== '데이터기준';
+        const isBi = r.운영방침 === '협의비재고';
+        const policyCell = hasPolicy
+          ? `<div style="display:flex;flex-direction:column;gap:3px;align-items:flex-start">
+               <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:${isBi?'#DBEAFE':'#E5E7EB'};color:${isBi?'#1D4ED8':'#374151'}">${isBi?'협의 비재고':'협의 재고'}</span>
+               ${r.운영방침_사유?`<span style="font-size:11px;color:var(--text3)">${r.운영방침_사유}</span>`:''}
+             </div>`
+          : '<span class="muted">—</span>';
         return `<tr>
           <td class="mono">${r.code}</td>
           <td style="font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.name}">${r.name}</td>
@@ -778,13 +806,9 @@ function renderList() {
           <td class="${avgC}">${r.avg6.toFixed(1)}</td>
           <td class="${curC}">${r.당월출고}</td>
           <td class="muted">${r.peak}</td>
-          <td class="fw6">${r.현재고}</td>
-          <td class="n-success">${r.입고잔량}</td>
-          <td class="muted">${r.출고잔량}</td>
-          <td class="fw6">${r.avail}</td>
-          <td class="${covC}">${r.cov.toFixed(1)}개월</td>
           <td>${spark(r.months, r.당월출고)}</td>
           <td>${bdg(r.verdict)}</td>
+          <td>${policyCell}</td>
         </tr>`;
       }).join('');
 
@@ -804,8 +828,7 @@ function renderList() {
           <thead><tr>
             <th>단품구분자</th><th>단품명</th><th>시리즈</th><th>사이즈</th><th>운영등급</th><th>상태</th>
             <th>직전6개월 평균</th><th>당월출고</th><th>피크월</th>
-            <th>현재고</th><th>입고잔량</th><th>출고잔량</th><th>가용재고</th>
-            <th>커버리지</th><th>추이(6+당월)</th><th>판정</th>
+            <th>추이(6+당월)</th><th>판정</th><th>운영방침</th>
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -849,11 +872,11 @@ function submitHistory() {
 }
 
 function exportCSV() {
-  const h = ['단품구분자','단품명','시리즈','사이즈','운영등급','상태','직전6개월평균','당월출고','피크월','현재고','입고잔량','출고잔량','가용재고','커버리지','판정'];
+  const h = ['단품구분자','단품명','시리즈','사이즈','운영등급','상태','직전6개월평균','당월출고','피크월','판정','운영방침','운영방침_사유'];
   const rows = allData.map(r => [
     r.code, r.name, r.시리즈, r.사이즈, r.운영등급, r.상태,
-    r.avg6.toFixed(1), r.당월출고, r.peak, r.현재고, r.입고잔량, r.출고잔량, r.avail,
-    r.cov.toFixed(1), {'to-non':'비재고 전환 권고','to-stock':'재고 전환 권고',watch:'모니터링',ok:'정상'}[r.verdict]
+    r.avg6.toFixed(1), r.당월출고, r.peak,
+    {'to-non':'비재고 전환 권고','to-stock':'재고 전환 권고',watch:'모니터링',ok:'정상'}[r.verdict], r.운영방침, r.운영방침_사유
   ]);
   const csv = '\uFEFF' + [h,...rows].map(x=>x.join(',')).join('\n');
   const a = document.createElement('a');
