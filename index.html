@@ -457,7 +457,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <div class="info-card-title">판정 기준</div>
             <div class="rule-item"><div class="rule-ttl" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개</div></div>
             <div class="rule-item"><div class="rule-ttl" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 > 10개</div></div>
-            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">재고: 트렌드↑ / 비재고: 피크 > 12개 또는 복합리스크</div></div>
+            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">재고: 트렌드↑ / 비재고: 피크 > 12개, 복합리스크, 또는 트렌드↑</div></div>
             <div class="rule-item"><div class="rule-ttl">가용재고</div><div class="rule-body">현재고 − 출고잔량(4주) + 입고잔량(4주)</div></div>
           </div>
         </div>
@@ -535,8 +535,7 @@ function judge(r) {
   }
   if (r.상태 === '비재고') {
     if (r.avg6 > 10) return 'to-stock';
-    if (r.peak > 12 && r.avg6 > 8) return 'watch';
-    if (r.peak > 12) return 'watch';
+    if (r.peak > 12 || (r.peak > 12 && r.avg6 > 8) || 트렌드) return 'watch';
     return 'ok';
   }
   return 'ok';
