@@ -344,14 +344,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <div class="kpi-num" id="kpi-non">—</div>
           <div class="kpi-sub">즉시 검토 필요</div>
         </div>
-        <div class="kpi-card kpi-success" onclick="switchTab('list');setFilter('to-stock')">
-          <div class="kpi-top">
-            <div class="kpi-label">재고 전환 권고</div>
-            <div class="kpi-icon"><svg viewBox="0 0 16 16"><path d="M8 13V4M5 7l3-3 3 3M2 14h12"/></svg></div>
-          </div>
-          <div class="kpi-num" id="kpi-stk">—</div>
-          <div class="kpi-sub">수요 증가 감지</div>
-        </div>
         <div class="kpi-card kpi-warn" onclick="switchTab('list');setFilter('watch')">
           <div class="kpi-top">
             <div class="kpi-label">모니터링</div>
@@ -359,6 +351,14 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
           <div class="kpi-num" id="kpi-wat">—</div>
           <div class="kpi-sub">경계 구간 품목</div>
+        </div>
+        <div class="kpi-card kpi-success" onclick="switchTab('list');setFilter('to-stock')">
+          <div class="kpi-top">
+            <div class="kpi-label">재고 전환 권고</div>
+            <div class="kpi-icon"><svg viewBox="0 0 16 16"><path d="M8 13V4M5 7l3-3 3 3M2 14h12"/></svg></div>
+          </div>
+          <div class="kpi-num" id="kpi-stk">—</div>
+          <div class="kpi-sub">수요 증가 감지</div>
         </div>
       </div>
 
@@ -373,18 +373,18 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           <div class="ib-body" id="ib-non-list"><div class="ib-empty">동기화 후 표시됩니다</div></div>
         </div>
         <div class="item-block">
-          <div class="ib-head ib-head-stk">
-            <span class="ib-head-title">재고 전환 권고</span>
-            <span class="ib-head-cnt" id="ib-stk-cnt">0</span>
-          </div>
-          <div class="ib-body" id="ib-stk-list"><div class="ib-empty">동기화 후 표시됩니다</div></div>
-        </div>
-        <div class="item-block">
           <div class="ib-head ib-head-wat">
             <span class="ib-head-title">모니터링</span>
             <span class="ib-head-cnt" id="ib-wat-cnt">0</span>
           </div>
           <div class="ib-body" id="ib-wat-list"><div class="ib-empty">동기화 후 표시됩니다</div></div>
+        </div>
+        <div class="item-block">
+          <div class="ib-head ib-head-stk">
+            <span class="ib-head-title">재고 전환 권고</span>
+            <span class="ib-head-cnt" id="ib-stk-cnt">0</span>
+          </div>
+          <div class="ib-body" id="ib-stk-list"><div class="ib-empty">동기화 후 표시됩니다</div></div>
         </div>
       </div>
 
@@ -733,7 +733,7 @@ function renderHistory(rows) {
   const tb = document.getElementById('history-body');
   if (!rows.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text3)">이력 없음</td></tr>'; return; }
   tb.innerHTML = [...rows].reverse().map(r => {
-    const name = masterData[r['단품구분자']]?.['단품명'] || r['단품구분자'] || '';
+    const name = masterData[r['단품구분자']]?.['단품명'] || '<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:#FEF3C7;color:#D97706;font-weight:600">이관 예정</span>';
     const ib = r['이전상태'] === '재고';
     return `<tr>
       <td class="muted">${r['날짜']||''}</td>
