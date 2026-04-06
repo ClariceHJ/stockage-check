@@ -345,32 +345,6 @@ tbody td{padding:10px 14px;vertical-align:middle}
           </div>
         </div>
 
-        <!-- 품목 블록 3단 -->
-        <div class="item-blocks">
-          <div class="item-block">
-            <div class="ib-header ib-non">
-              <span class="ib-title">비재고 전환 권고</span>
-              <span class="ib-count" id="ib-non-cnt">0</span>
-            </div>
-            <div class="ib-body" id="ib-non-list"></div>
-          </div>
-          <div class="item-block">
-            <div class="ib-header ib-stk">
-              <span class="ib-title">재고 전환 권고</span>
-              <span class="ib-count" id="ib-stk-cnt">0</span>
-            </div>
-            <div class="ib-body" id="ib-stk-list"></div>
-          </div>
-          <div class="item-block">
-            <div class="ib-header ib-wat">
-              <span class="ib-title">모니터링</span>
-              <span class="ib-count" id="ib-wat-cnt">0</span>
-            </div>
-            <div class="ib-body" id="ib-wat-list"></div>
-          </div>
-        </div>
-
-
         <!-- 협의 확정 운영방침 -->
         <div class="policy-card" id="policy-block" style="display:none">
           <div class="policy-head">
@@ -615,9 +589,6 @@ function renderAll(){
   renderSeriesChart(allData);
   renderPolicyBlock(allData);
   // 품목 블록
-  renderBlock('ib-non-list','ib-non-cnt',allData.filter(r=>r.verdict==='to-non'));
-  renderBlock('ib-stk-list','ib-stk-cnt',allData.filter(r=>r.verdict==='to-stock'));
-  renderBlock('ib-wat-list','ib-wat-cnt',allData.filter(r=>r.verdict==='watch'));
 
   // 목록 사이드 필터 active 동기화
   updateListSideActive();
@@ -837,8 +808,7 @@ document.getElementById('modal').addEventListener('click',e=>{if(e.target===docu
 
 // 초기 빈 상태
 document.getElementById('ov-empty').style.display='block';
-['ib-non-list','ib-stk-list','ib-wat-list'].forEach(id=>{
-  document.getElementById(id).innerHTML='<div class="ib-empty">동기화 후 표시됩니다</div>';
+
 });
 </script>
 </body>
