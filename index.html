@@ -334,6 +334,32 @@ tbody td{padding:10px 14px;vertical-align:middle}
           </div>
         </div>
 
+        <!--
+
+        <!-- 시리즈별 재고/비재고 현황 -->
+        <div class="series-card">
+          <div class="series-header">
+            <span class="series-title">시리즈 × 사이즈별 재고/비재고 현황</span>
+            <div class="series-legend">
+              <div class="leg-item"><div class="leg-dot" style="background:var(--accent-bg);border:1px solid var(--accent)"></div>재고</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#F3F4F6;border:1px solid #D1D5DB"></div>비재고</div>
+              <div class="leg-item"><div class="leg-dot" style="background:var(--warn-bg);border:1px solid var(--warn)"></div>혼재</div>
+            </div>
+          </div>
+          <div class="series-bars" id="series-chart"></div>
+        </div>
+
+        <!-- 운영방침 블록 -->
+        <div class="item-block" id="policy-block" style="display:none">
+          <div class="ib-header" style="background:#F9FAFB;border-bottom:1px solid var(--border)">
+            <span class="ib-title" style="color:var(--text)">협의 확정 운영방침</span>
+            <span class="ib-count" id="ib-policy-cnt" style="background:#F3F4F6;color:var(--text2)">0</span>
+          </div>
+          <div class="ib-body" id="ib-policy-list"></div>
+        </div>
+
+        <!-- 
+
         <!-- 품목 블록 3단 -->
         <div class="item-blocks">
           <div class="item-block">
@@ -358,6 +384,35 @@ tbody td{padding:10px 14px;vertical-align:middle}
             <div class="ib-body" id="ib-wat-list"></div>
           </div>
         </div>
+
+        <!--
+
+        <!-- 품목 블록 3단 -->
+        <div class="item-blocks">
+          <div class="item-block">
+            <div class="ib-header ib-non">
+              <span class="ib-title">비재고 전환 권고</span>
+              <span class="ib-count" id="ib-non-cnt">0</span>
+            </div>
+            <div class="ib-body" id="ib-non-list"></div>
+          </div>
+          <div class="item-block">
+            <div class="ib-header ib-stk">
+              <span class="ib-title">재고 전환 권고</span>
+              <span class="ib-count" id="ib-stk-cnt">0</span>
+            </div>
+            <div class="ib-body" id="ib-stk-list"></div>
+          </div>
+          <div class="item-block">
+            <div class="ib-header ib-wat">
+              <span class="ib-title">모니터링</span>
+              <span class="ib-count" id="ib-wat-cnt">0</span>
+            </div>
+            <div class="ib-body" id="ib-wat-list"></div>
+          </div>
+        </div>
+
+        <!--
 
         <!-- 빈 상태 -->
         <div id="ov-empty" style="display:none;text-align:center;padding:4rem;color:var(--text3)">
@@ -388,7 +443,6 @@ tbody td{padding:10px 14px;vertical-align:middle}
           </div>
           <div class="series-bars" id="series-chart"></div>
         </div>
-
       </div>
     </div>
   </div>
