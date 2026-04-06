@@ -448,7 +448,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <div class="rule-item"><div class="rule-ttl" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개</div></div>
             <div class="rule-item"><div class="rule-ttl" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 > 10개</div></div>
             <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">비재고: 피크 > 12개, 복합리스크, 또는 트렌드↑</div></div>
-            <div class="rule-item"><div class="rule-ttl">가용재고</div><div class="rule-body">현재고 − 출고잔량(4주) + 입고잔량(4주)</div></div>
           </div>
         </div>
         <div id="list-area">
@@ -511,7 +510,7 @@ const MONTH_RE = /^\d{4}-\d{2}$/;
 const SIZE_ORDER = ['옵션','S','SS','Q','K','KK','LKK'];
 const SERIES_ORDER = ['아콘','아몬드','버치','아티초크'];
 
-let masterData = {}, 당월Data = {}, allData = [], activeFilter = 'all', pendingRecord = null;
+let masterData = {}, 당월Data = {}, allData = [], activeFilter = 'all', filterSeries = 'all', filterStatus = 'all', pendingRecord = null;
 
 function judge(r) {
   const 전반 = r.months.slice(0,3), 후반 = r.months.slice(3,6);
@@ -612,7 +611,7 @@ async function syncAll() {
     ]);
     masterData = {}; 현황rows.forEach(r => { if (r['단품구분자']) masterData[r['단품구분자']] = r; });
     당월Data  = {}; 당월rows.forEach(r  => { if (r['단품구분자']) 당월Data[r['단품구분자']]   = r; });
-    allData = buildAllData(); activeFilter = 'all';
+    allData = buildAllData(); activeFilter = 'all'; activeSeriesFilter = 'all'; activeStatusFilter = 'all';
     const dates = [...new Set(Object.values(당월Data).map(r=>r['실적기준일']).filter(Boolean))].sort();
     const latestDate = dates[dates.length-1]||'—';
     document.getElementById('info-date').textContent = latestDate;
@@ -767,11 +766,20 @@ function updateListSide(cnt) {
 function renderList() {
   const cnt = getCnt(allData);
   updateListSide(cnt);
-  const filtered = activeFilter === 'all' ? allData : allData.filter(r => r.verdict === activeFilter);
+  let filtered = activeFilter === 'all' ? allData : allData.filter(r => r.verdict === activeFilter);
+  if (filterSeries !== 'all') filtered = filtered.filter(r => r.시리즈 === filterSeries);
+  if (filterStatus !== 'all') filtered = filtered.filter(r => r.상태 === filterStatus);
   function cCls(f) {
     const m = { all:'chip on-all','to-non':'chip on-non','to-stock':'chip on-stk', watch:'chip on-wat' };
     return activeFilter === f ? (m[f]||'chip') : 'chip';
   }
+  function sCls(s) { return filterStatus === s ? 'chip on-all' : 'chip'; }
+  // 시리즈 목록
+  const allSeries = ['all', ...new Set(allData.map(r=>r.시리즈).filter(Boolean))].sort((a,b)=>a==='all'?-1:b==='all'?1:a.localeCompare(b));
+  const seriesChips = allSeries.map(s => {
+    const cls = filterSeries === s ? 'chip on-all' : 'chip';
+    return `<span class="${cls}" onclick="setSeries('${s}')">${s==='all'?'전체':s}</span>`;
+  }).join('');
   const rows = !filtered.length
     ? `<tr><td colspan="12" style="text-align:center;padding:3rem;color:var(--text3)">해당 항목 없음</td></tr>`
     : filtered.map(r => {
@@ -803,13 +811,29 @@ function renderList() {
 
   document.getElementById('list-area').innerHTML = `
     <div class="tbl-card">
-      <div class="tbl-top">
-        <div><div class="tbl-title">전체 품목</div><div class="tbl-sub">${filtered.length}개</div></div>
-        <div class="chips">
-          <span class="${cCls('all')}"      onclick="setFilter('all')">전체 ${cnt.all}</span>
-          <span class="${cCls('to-non')}"   onclick="setFilter('to-non')">비재고 전환 ${cnt['to-non']}</span>
-          <span class="${cCls('to-stock')}" onclick="setFilter('to-stock')">재고 전환 ${cnt['to-stock']}</span>
-          <span class="${cCls('watch')}"    onclick="setFilter('watch')">모니터링 ${cnt.watch}</span>
+      <div class="tbl-top" style="flex-direction:column;align-items:stretch;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div><div class="tbl-title">전체 품목</div><div class="tbl-sub">${filtered.length}개</div></div>
+          <div class="chips">
+            <span class="${cCls('all')}"      onclick="setFilter('all')">전체 ${cnt.all}</span>
+            <span class="${cCls('to-non')}"   onclick="setFilter('to-non')">비재고 전환 ${cnt['to-non']}</span>
+            <span class="${cCls('to-stock')}" onclick="setFilter('to-stock')">재고 전환 ${cnt['to-stock']}</span>
+            <span class="${cCls('watch')}"    onclick="setFilter('watch')">모니터링 ${cnt.watch}</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;font-weight:600;color:var(--text3)">시리즈</span>
+            <div class="chips" id="series-filter-chips">${seriesChips}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;font-weight:600;color:var(--text3)">운영상태</span>
+            <div class="chips">
+              <span class="${sCls('all')}"    onclick="setStatus('all')">전체</span>
+              <span class="${sCls('재고')}"   onclick="setStatus('재고')">재고</span>
+              <span class="${sCls('비재고')}" onclick="setStatus('비재고')">비재고</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="tbl-scroll">
@@ -826,6 +850,10 @@ function renderList() {
 }
 
 function setFilter(f) { activeFilter = f; renderList(); }
+function setSeriesFilter(f) { activeSeriesFilter = f; renderList(); }
+function setStatusFilter(f) { activeStatusFilter = f; renderList(); }
+function setSeries(s) { filterSeries = s; renderList(); }
+function setStatus(s) { filterStatus = s; renderList(); }
 
 function switchTab(t) {
   const tabs = ['overview','list','history','guide'];
