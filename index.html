@@ -406,9 +406,6 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
 
 
       <!-- 빈 상태 -->
-      <div id="ov-empty" style="display:none">
-        <div class="empty-state">
-          <div class="empty-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></div>
           <h3>데이터를 불러오세요</h3>
           <p>상단의 Sheets 동기화 버튼을 누르면<br>현황·당월실적·이력 시트를 불러옵니다</p>
           <button class="btn btn-outline" onclick="loadSample()">샘플 데이터로 보기</button>
@@ -457,7 +454,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
             <div class="info-card-title">판정 기준</div>
             <div class="rule-item"><div class="rule-ttl" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개</div></div>
             <div class="rule-item"><div class="rule-ttl" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 > 10개</div></div>
-            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">재고: 트렌드↑ / 비재고: 피크 > 12개, 복합리스크, 또는 트렌드↑</div></div>
+            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">비재고: 피크 > 12개, 복합리스크, 또는 트렌드↑</div></div>
             <div class="rule-item"><div class="rule-ttl">가용재고</div><div class="rule-body">현재고 − 출고잔량(4주) + 입고잔량(4주)</div></div>
           </div>
         </div>
@@ -881,33 +878,6 @@ function exportCSV() {
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
   a.download = `재고전환판정_${new Date().toISOString().slice(0,10)}.csv`; a.click();
-}
-
-function loadSample() {
-  masterData = {
-    'SLFC0110A-NWW': {단품명:'아콘프레임 상판 SS',사이즈:'SS',시리즈:'(슬로우)아콘',공급처:'충주1공장',재고구분:'재고',운영등급:'A',운영방침:'협의재고',운영방침_사유:'아콘 SS 납기 단순화','2025-10':10,'2025-11':8,'2025-12':11,'2026-01':9,'2026-02':10,'2026-03':7},
-    'SLFC0150A-OCY': {단품명:'아콘프레임 상판 Q', 사이즈:'Q', 시리즈:'(슬로우)아콘',공급처:'충주1공장',재고구분:'재고',운영등급:'B',운영방침:'데이터기준',운영방침_사유:'','2025-10':3,'2025-11':4,'2025-12':2,'2026-01':3,'2026-02':3,'2026-03':4},
-    'SLFE0110A-TL':  {단품명:'아몬드 바닥판A SS', 사이즈:'SS', 시리즈:'(슬로우)아몬드',공급처:'충주1공장',재고구분:'재고',운영등급:'A',운영방침:'데이터기준',운영방침_사유:'','2025-10':13,'2025-11':10,'2025-12':12,'2026-01':11,'2026-02':14,'2026-03':8},
-    'SLFF0150A-NK':  {단품명:'버치 베이스 Q',     사이즈:'Q',  시리즈:'(슬로우)버치', 공급처:'충주1공장',재고구분:'비재고',운영등급:'B',운영방침:'협의비재고',운영방침_사유:'도착보장 품목 확보','2025-10':4,'2025-11':2,'2025-12':3,'2026-01':5,'2026-02':3,'2026-03':4},
-    'SLFE0165A-TL':  {단품명:'아몬드 바닥판A K',  사이즈:'K',  시리즈:'(슬로우)아몬드',공급처:'충주1공장',재고구분:'비재고',운영등급:'C',운영방침:'데이터기준',운영방침_사유:'','2025-10':5,'2025-11':6,'2025-12':7,'2026-01':5,'2026-02':6,'2026-03':5},
-    'SLFN0110BR1-OCY':{단품명:'아티초크 바닥판B SS',사이즈:'SS',시리즈:'(슬로우)아티초크',공급처:'충주1공장',재고구분:'재고',운영등급:'A',운영방침:'데이터기준',운영방침_사유:'','2025-10':25,'2025-11':22,'2025-12':28,'2026-01':24,'2026-02':27,'2026-03':26},
-  };
-  당월Data = {
-    'SLFC0110A-NWW':  {현재고:'15',당월출고량:'4','입고잔량(4주)':'5','출고잔량(4주)':'3', 실적기준일:'2026-04-06'},
-    'SLFC0150A-OCY':  {현재고:'6', 당월출고량:'2','입고잔량(4주)':'0','출고잔량(4주)':'1', 실적기준일:'2026-04-06'},
-    'SLFE0110A-TL':   {현재고:'8', 당월출고량:'5','입고잔량(4주)':'3','출고잔량(4주)':'2', 실적기준일:'2026-04-06'},
-    'SLFF0150A-NK':   {현재고:'0', 당월출고량:'13','입고잔량(4주)':'0','출고잔량(4주)':'0',실적기준일:'2026-04-06'},
-    'SLFE0165A-TL':   {현재고:'0', 당월출고량:'6','입고잔량(4주)':'0','출고잔량(4주)':'0', 실적기준일:'2026-04-06'},
-    'SLFN0110BR1-OCY':{현재고:'12',당월출고량:'18','입고잔량(4주)':'0','출고잔량(4주)':'5',실적기준일:'2026-04-06'},
-  };
-  allData = buildAllData(); activeFilter = 'all';
-  document.getElementById('last-update').textContent = '샘플 데이터 표시 중';
-  document.getElementById('sb-date').textContent = '2026-04-06';
-  document.getElementById('info-date').textContent = '2026-04-06';
-  document.getElementById('info-cur').textContent = `${Object.keys(당월Data).length}개`;
-  document.getElementById('export-btn').style.display = 'inline-flex';
-    document.getElementById('guide-msg').style.display = 'block';
-  renderOverview(); renderList(); renderHistory([]);
 }
 
 document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
