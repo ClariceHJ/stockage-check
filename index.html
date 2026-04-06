@@ -630,13 +630,11 @@ function renderPolicyBlock(data){
     const tagBg=isBi?'#DBEAFE':'#E5E7EB';
     const tagColor=isBi?'#1D4ED8':'#374151';
     const tagText=isBi?'협의 비재고':'협의 재고';
-    return`<div class="ib-item">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-        <div class="ib-code">${r.code}</div>
-        <span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;background:${tagBg};color:${tagColor}">${tagText}</span>
-      </div>
-      <div class="ib-name">${r.name}</div>
-      <div class="ib-meta">${r.시리즈.replace(/^\(.*?\)\s*/,'')} ${r.사이즈}${r.운영방침_사유?' · '+r.운영방침_사유:''}</div>
+    return`<div class="ib-item" style="display:flex;align-items:center;gap:10px;padding:9px 16px">
+      <div class="ib-code" style="width:120px;flex-shrink:0">${r.code}</div>
+      <div class="ib-name" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+      <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:${tagBg};color:${tagColor};flex-shrink:0">${tagText}</span>
+      <div class="ib-meta" style="flex-shrink:0;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.운영방침_사유||'—'}</div>
     </div>`;
   }).join('');
 }
