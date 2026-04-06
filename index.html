@@ -519,7 +519,6 @@ function judge(r) {
   const 트렌드 = avg후 > avg전 * 1.2 && avg후 > 3;
   if (r.상태 === '재고') {
     if (r.avg6 <= 10) return 'to-non';
-    if (트렌드) return 'watch';
     return 'ok';
   }
   if (r.상태 === '비재고') {
