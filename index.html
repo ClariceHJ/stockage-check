@@ -161,13 +161,16 @@ tbody td{padding:10px 14px;vertical-align:middle}
 .cov-md{color:var(--warn);font-weight:500}
 .spark{display:flex;align-items:flex-end;gap:2px;height:22px}
 .spark span{display:inline-block;border-radius:2px;width:5px}
-/* ── 시리즈×사이즈 매트릭스 ── */
-.series-group{margin-bottom:16px}
-.series-group:last-child{margin-bottom:0}
-.series-group-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.sg-name{font-size:12px;font-weight:600;color:var(--text)}
-.sg-summary{font-size:11px;font-family:'JetBrains Mono',monospace}
-.series-group-body{display:flex;flex-direction:column;gap:5px;padding-left:4px;border-left:2px solid var(--border)}
+/* ── 시리즈×사이즈 컴팩트 배지 ── */
+.cl-list{display:flex;flex-direction:column;gap:9px}
+.cl-row{display:flex;align-items:center;gap:10px}
+.cl-series{font-size:12px;font-weight:600;color:var(--text);width:52px;flex-shrink:0}
+.cl-sizes{display:flex;gap:5px;flex-wrap:wrap}
+.cl-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;white-space:nowrap;cursor:pointer;transition:opacity .15s}
+.cl-badge:hover{opacity:.75}
+.cl-재고{background:var(--accent-bg);color:var(--accent)}
+.cl-비재고{background:#F3F4F6;color:var(--text2)}
+.cl-mix{background:var(--warn-bg);color:var(--warn)}
 
 /* ── 시리즈 차트 ── */
 .series-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:20px 22px}
@@ -177,13 +180,13 @@ tbody td{padding:10px 14px;vertical-align:middle}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
 .leg-dot{width:8px;height:8px;border-radius:2px}
 .series-bars{display:flex;flex-direction:column;gap:10px}
-.sb-row{display:flex;align-items:center;gap:10px}
-.sb-label{font-size:12px;font-weight:500;color:var(--text2);width:52px;flex-shrink:0}
-.sb-track{flex:1;display:flex;height:20px;border-radius:4px;overflow:hidden;background:#F3F4F6}
-.sb-seg{height:100%;transition:width .4s ease}
-.sb-seg-재고{background:var(--accent-bg)}
-.sb-seg-비재고{background:#F3F4F6}
-.sb-nums{font-size:11px;color:var(--text3);width:64px;text-align:right;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+
+
+
+
+
+
+
 
 
 /* 이력 */
@@ -367,8 +370,9 @@ tbody td{padding:10px 14px;vertical-align:middle}
           <div class="series-header">
             <span class="series-title">시리즈 × 사이즈별 재고/비재고 현황</span>
             <div class="series-legend">
-              <div class="leg-item"><div class="leg-dot" style="background:var(--accent)"></div>재고</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#D1D5DB"></div>비재고</div>
+              <div class="leg-item"><div class="leg-dot" style="background:var(--accent-bg);border:1px solid var(--accent)"></div>재고</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#F3F4F6;border:1px solid #D1D5DB"></div>비재고</div>
+              <div class="leg-item"><div class="leg-dot" style="background:var(--warn-bg);border:1px solid var(--warn)"></div>혼재</div>
             </div>
           </div>
           <div class="series-bars" id="series-chart"></div>
@@ -601,10 +605,10 @@ function renderAll(){
 function renderSeriesChart(data){
   const el=document.getElementById('series-chart');
   if(!el)return;
-
-  // 시리즈×사이즈 집계
-  const map={};
   const sizeOrder=['옵션','S','SS','Q','K','KK','LKK'];
+  const seriesOrder=['아콘','아몬드','버치','아티초크'];
+
+  const map={};
   data.forEach(r=>{
     const s=r.시리즈||'기타'; const sz=r.사이즈||'—';
     if(!map[s])map[s]={};
@@ -612,44 +616,25 @@ function renderSeriesChart(data){
     map[s][sz][r.상태==='재고'?'재고':'비재고']++;
   });
 
-  const seriesOrder=['아콘','아몬드','버치','아티초크'];
   const series=Object.keys(map).sort((a,b)=>{
-    const ia=seriesOrder.indexOf(a); const ib=seriesOrder.indexOf(b);
+    const ia=seriesOrder.indexOf(a),ib=seriesOrder.indexOf(b);
     return(ia===-1?99:ia)-(ib===-1?99:ib);
   });
 
-  el.innerHTML=series.map(s=>{
+  el.innerHTML='<div class="cl-list">'+series.map(s=>{
     const sizes=Object.keys(map[s]).sort((a,b)=>{
-      const ia=sizeOrder.indexOf(a); const ib=sizeOrder.indexOf(b);
+      const ia=sizeOrder.indexOf(a),ib=sizeOrder.indexOf(b);
       return(ia===-1?99:ia)-(ib===-1?99:ib);
     });
-    const allStock=sizes.reduce((sum,sz)=>sum+map[s][sz].재고,0);
-    const allNon=sizes.reduce((sum,sz)=>sum+map[s][sz].비재고,0);
-    const maxTotal=Math.max(...sizes.map(sz=>map[s][sz].재고+map[s][sz].비재고),1);
-
-    const sizeRows=sizes.map(sz=>{
+    const badges=sizes.map(sz=>{
       const v=map[s][sz];
-      const total=v.재고+v.비재고;
-      const wStock=Math.round((v.재고/maxTotal)*100);
-      const wNon=Math.round((v.비재고/maxTotal)*100);
-      return`<div class="sb-row">
-        <div class="sb-label" style="width:44px;font-size:11px">${sz}</div>
-        <div class="sb-track">
-          <div class="sb-seg" style="width:${wStock}%;background:var(--accent-bg);border-right:${v.재고&&v.비재고?'1px solid #dde2f0':'none'}"></div>
-          <div class="sb-seg" style="width:${wNon}%;background:#E5E7EB"></div>
-        </div>
-        <div class="sb-nums" style="width:52px"><span style="color:var(--accent)">${v.재고}</span><span style="color:#d1d5db"> / </span><span style="color:var(--text3)">${v.비재고}</span></div>
-      </div>`;
+      const isMix=v.재고>0&&v.비재고>0;
+      const cls=isMix?'cl-mix':v.재고>0?'cl-재고':'cl-비재고';
+      const label=isMix?`${sz} ${v.재고}재/${v.비재고}비`:`${sz} ${v.재고+v.비재고}`;
+      return`<span class="cl-badge ${cls}" onclick="gotoList('all')">${label}</span>`;
     }).join('');
-
-    return`<div class="series-group">
-      <div class="series-group-header">
-        <span class="sg-name">${s}</span>
-        <span class="sg-summary"><span style="color:var(--accent)">${allStock}</span> / <span style="color:var(--text3)">${allNon}</span></span>
-      </div>
-      <div class="series-group-body">${sizeRows}</div>
-    </div>`;
-  }).join('');
+    return`<div class="cl-row"><div class="cl-series">${s.replace(/^\(.*?\)\s*/,'')}</div><div class="cl-sizes">${badges}</div></div>`;
+  }).join('')+'</div>';
 }
 
 function renderBlock(listId,cntId,items){
@@ -660,7 +645,7 @@ function renderBlock(listId,cntId,items){
     <div class="ib-item" onclick="gotoList('${r.verdict}')">
       <div class="ib-code">${r.code}</div>
       <div class="ib-name">${r.name}</div>
-      <div class="ib-meta">${r.시리즈} ${r.사이즈} · 직전6개월 평균 ${r.avg6.toFixed(1)}개</div>
+      <div class="ib-meta">${r.시리즈.replace(/^\(.*?\)\s*/,'')} ${r.사이즈} · 직전6개월 평균 ${r.avg6.toFixed(1)}개</div>
     </div>`).join('');
 }
 
@@ -694,7 +679,7 @@ function renderList(){
       return`<tr>
         <td class="mono">${r.code}</td>
         <td style="font-weight:500;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px" title="${r.name}">${r.name}</td>
-        <td class="muted">${r.시리즈}</td>
+        <td class="muted">${r.시리즈.replace(/^\(.*?\)\s*/,'')}</td>
         <td class="muted">${r.사이즈}</td>
         <td class="muted">${r.운영등급}</td>
         <td><span class="spl spl-${r.상태}">${r.상태}</span></td>
