@@ -168,9 +168,10 @@ tbody td{padding:10px 14px;vertical-align:middle}
 .cl-sizes{display:flex;gap:5px;flex-wrap:wrap}
 .cl-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;white-space:nowrap;cursor:pointer;transition:opacity .15s}
 .cl-badge:hover{opacity:.75}
-.cl-재고{background:var(--accent-bg);color:var(--accent)}
-.cl-비재고{background:#F3F4F6;color:var(--text2)}
-.cl-mix{background:var(--warn-bg);color:var(--warn)}
+#policy-block{}
+.cl-재고{background:#DBEAFE;color:#1D4ED8;font-weight:600}
+.cl-비재고{background:#E5E7EB;color:#374151;font-weight:600}
+.cl-mix{background:#FED7AA;color:#C2410C;font-weight:600}
 
 /* ── 시리즈 차트 ── */
 .series-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:20px 22px}
@@ -365,6 +366,16 @@ tbody td{padding:10px 14px;vertical-align:middle}
           <button class="btn" onclick="loadSample()">샘플 데이터로 보기</button>
         </div>
 
+
+        <!-- 운영방침 블록 -->
+        <div class="item-block" id="policy-block" style="display:none">
+          <div class="ib-header" style="background:#F9FAFB;border-bottom:1px solid var(--border)">
+            <span class="ib-title" style="color:var(--text)">협의 확정 운영방침</span>
+            <span class="ib-count" id="ib-policy-cnt" style="background:#F3F4F6;color:var(--text2)">0</span>
+          </div>
+          <div class="ib-body" id="ib-policy-list"></div>
+        </div>
+
         <!-- 시리즈별 재고/비재고 현황 -->
         <div class="series-card">
           <div class="series-header">
@@ -477,7 +488,7 @@ tbody td{padding:10px 14px;vertical-align:middle}
 <script>
 const SHEET_ID='1ivNPbJSqoabJhVkrNV68ASADRN_6iAPsWawe54P69Jk';
 const SH={현황:'재고구분_현황',이력:'재고구분_전환이력',당월:'당월실적'};
-const META_COLS=['단품구분자','단품명','사이즈','시리즈','공급처','재고구분','운영등급','기준일'];
+const META_COLS=['단품구분자','단품명','사이즈','시리즈','공급처','재고구분','운영등급','운영방침','운영방침_사유','기준일'];
 const MONTH_RE=/^\d{4}-\d{2}$/;
 
 let masterData={},당월Data={},allData=[],activeFilter='all',pendingRecord=null;
@@ -549,7 +560,7 @@ function buildAllData(){
     const avail=Math.max(0,현재고-출고잔량+입고잔량);
     const cov=avg6>0?avail/avg6:0;
     const rec={code,name:m['단품명']||code,시리즈:m['시리즈']||'',공급처:m['공급처']||'',
-      상태:m['재고구분']||'재고',사이즈:m['사이즈']||'',운영등급:m['운영등급']||'',기준일:m['기준일']||'',
+      상태:m['재고구분']||'재고',사이즈:m['사이즈']||'',운영등급:m['운영등급']||'',운영방침:m['운영방침']||'데이터기준',운영방침_사유:m['운영방침_사유']||'',기준일:m['기준일']||'',
       avg6,peak,months:l6vals,당월출고,현재고,입고잔량,출고잔량,avail,cov,실적기준일,verdict:'ok'};
     rec.verdict=judge(rec);return rec;
   });
@@ -591,6 +602,8 @@ function renderAll(){
 
   // 시리즈별 차트
   renderSeriesChart(allData);
+  // 운영방침 블록
+  renderPolicyBlock(allData);
   // 품목 블록
   renderBlock('ib-non-list','ib-non-cnt',allData.filter(r=>r.verdict==='to-non'));
   renderBlock('ib-stk-list','ib-stk-cnt',allData.filter(r=>r.verdict==='to-stock'));
@@ -601,6 +614,32 @@ function renderAll(){
   renderList();
 }
 
+
+
+function renderPolicyBlock(data){
+  const items=data.filter(r=>r.운영방침&&r.운영방침!=='데이터기준');
+  const block=document.getElementById('policy-block');
+  const cnt=document.getElementById('ib-policy-cnt');
+  const list=document.getElementById('ib-policy-list');
+  if(!block)return;
+  if(!items.length){block.style.display='none';return;}
+  block.style.display='block';
+  cnt.textContent=items.length;
+  list.innerHTML=items.map(r=>{
+    const isBi=r.운영방침==='협의비재고';
+    const tagBg=isBi?'#DBEAFE':'#E5E7EB';
+    const tagColor=isBi?'#1D4ED8':'#374151';
+    const tagText=isBi?'협의 비재고':'협의 재고';
+    return`<div class="ib-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+        <div class="ib-code">${r.code}</div>
+        <span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;background:${tagBg};color:${tagColor}">${tagText}</span>
+      </div>
+      <div class="ib-name">${r.name}</div>
+      <div class="ib-meta">${r.시리즈.replace(/^\(.*?\)\s*/,'')} ${r.사이즈}${r.운영방침_사유?' · '+r.운영방침_사유:''}</div>
+    </div>`;
+  }).join('');
+}
 
 function renderSeriesChart(data){
   const el=document.getElementById('series-chart');
