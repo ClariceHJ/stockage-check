@@ -163,7 +163,7 @@ tbody td{padding:10px 14px;vertical-align:middle}
 .spark span{display:inline-block;border-radius:2px;width:5px}
 .policy-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
 .policy-head{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.policy-head-title{font-size:13px;font-weight:600;color:var(--text)}
+.policy-title{font-size:13px;font-weight:600;color:var(--text)}
 .policy-cnt{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:#F3F4F6;color:var(--text2)}
 .policy-body{max-height:280px;overflow-y:auto}
 .policy-row{display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid #F3F4F6;font-size:12px}
@@ -368,6 +368,23 @@ tbody td{padding:10px 14px;vertical-align:middle}
             </div>
             <div class="ib-body" id="ib-wat-list"></div>
           </div>
+        </div>
+
+
+        <!-- 협의 확정 운영방침 -->
+        <div class="policy-card" id="policy-block" style="display:none">
+          <div class="policy-head">
+            <span class="policy-title">협의 확정 운영방침</span>
+            <span class="policy-cnt" id="ib-policy-cnt">0</span>
+          </div>
+          <div class="policy-body" id="ib-policy-list"></div>
+        </div>
+
+        <!-- 빈 상태 -->
+        <div id="ov-empty" style="display:none;text-align:center;padding:4rem;color:var(--text3)">
+          <p style="font-size:15px;font-weight:500;margin-bottom:8px;color:var(--text2)">Sheets 동기화를 눌러주세요</p>
+          <p style="font-size:13px;margin-bottom:16px">현황·당월실적·전환이력 시트를 한번에 불러옵니다</p>
+          <button class="btn" onclick="loadSample()">샘플 데이터로 보기</button>
         </div>
 
         <!-- 시리즈별 재고/비재고 현황 -->
@@ -608,7 +625,6 @@ function renderAll(){
 }
 
 
-
 function renderPolicyBlock(data){
   const items=data.filter(r=>r.운영방침&&r.운영방침!=='데이터기준');
   const block=document.getElementById('policy-block');
@@ -827,20 +843,3 @@ document.getElementById('ov-empty').style.display='block';
 </script>
 </body>
 </html>
-
-        <!-- 협의 확정 운영방침 -->
-        <div class="policy-card" id="policy-block" style="display:none">
-          <div class="policy-head">
-            <span class="policy-head-title">협의 확정 운영방침</span>
-            <span class="policy-cnt" id="ib-policy-cnt">0</span>
-          </div>
-          <div class="policy-body" id="ib-policy-list"></div>
-        </div>
-
-        <!-- 빈 상태 -->
-        <div id="ov-empty" style="display:none;text-align:center;padding:4rem;color:var(--text3)">
-          <p style="font-size:15px;font-weight:500;margin-bottom:8px;color:var(--text2)">Sheets 동기화를 눌러주세요</p>
-          <p style="font-size:13px;margin-bottom:16px">현황·당월실적·전환이력 시트를 한번에 불러옵니다</p>
-          <button class="btn" onclick="loadSample()">샘플 데이터로 보기</button>
-        </div>
-      </div>
