@@ -7,24 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ECEEF2;
-  --surface:#F7F8FA;
-  --white:#FFFFFF;
-  --text:#1A1D23;
-  --text2:#6B7280;
-  --text3:#9CA3AF;
-  --border:#E5E7EB;
-  --border2:#D1D5DB;
-  --accent:#3B5BDB;
-  --accent-bg:#EEF2FF;
-  --danger:#E03131;
-  --danger-bg:#FFF5F5;
-  --success:#2F9E44;
-  --success-bg:#EBFBEE;
-  --warn:#E67700;
-  --warn-bg:#FFF9DB;
-  --r:18px;
-  --r-sm:10px;
+  --bg:#ECEEF2;--white:#FFFFFF;
+  --text:#1A1D23;--text2:#6B7280;--text3:#9CA3AF;
+  --border:#E5E7EB;--border2:#D1D5DB;
+  --accent:#3B5BDB;--accent-bg:#EEF2FF;
+  --danger:#E03131;--danger-bg:#FFF5F5;
+  --success:#2F9E44;--success-bg:#EBFBEE;
+  --warn:#E67700;--warn-bg:#FFF9DB;
+  --r:16px;--r-sm:10px;
   --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 20px rgba(0,0,0,.05);
   --shadow-sm:0 1px 3px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
 }
@@ -32,12 +22,12 @@
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
 
 /* ── NAV ── */
-.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;gap:32px;height:56px}
-.logo{display:flex;align-items:center;gap:9px;margin-right:12px}
+.nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;gap:24px;height:56px;position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:9px}
 .logo-icon{width:30px;height:30px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center}
 .logo-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
 .logo-name{font-size:14px;font-weight:600;letter-spacing:-.2px}
-.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links{display:flex;align-items:center;gap:2px;margin-left:8px}
 .nav-link{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s}
 .nav-link:hover{color:var(--text);background:#F3F4F6}
 .nav-link.active{color:var(--text);background:#F3F4F6;font-weight:600}
@@ -47,53 +37,96 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .btn:hover{border-color:#9CA3AF;color:var(--text)}
 .btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 .btn-primary{background:var(--text);color:#fff;border-color:var(--text)}
-.btn-primary:hover{background:#374151;border-color:#374151}
+.btn-primary:hover{background:#374151}
 .btn-sm{padding:5px 10px;font-size:12px}
 
 /* ── LAYOUT ── */
-.layout{display:grid;grid-template-columns:260px 1fr;gap:16px;padding:20px 24px 32px;max-width:1400px;margin:0 auto}
+.page{padding:20px 24px 40px;max-width:1500px;margin:0 auto}
 
-/* ── LEFT PANEL ── */
-.left{display:flex;flex-direction:column;gap:12px}
+/* ── 패널 ── */
+.panel{display:none}.panel.active{display:block}
 
-/* ── CARDS ── */
-.card{background:var(--white);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
-.card-title{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:14px}
+/* ════════════════════
+   표지 패널
+════════════════════ */
+.overview{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
 
-/* ── SUMMARY CARD ── */
+/* 왼쪽 사이드 */
+.ov-left{display:flex;flex-direction:column;gap:12px}
 .summary-card{background:var(--white);border-radius:var(--r);padding:24px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
-.summary-main{margin-bottom:20px}
-.summary-main .big-num{font-size:48px;font-weight:300;letter-spacing:-2px;line-height:1;color:var(--text)}
-.summary-main .big-label{font-size:12px;color:var(--text3);margin-top:4px}
+.big-num{font-size:52px;font-weight:300;letter-spacing:-2px;line-height:1}
+.big-label{font-size:12px;color:var(--text3);margin-top:4px}
 .divider{height:1px;background:var(--border);margin:16px 0}
-.stat-list{display:flex;flex-direction:column;gap:10px}
-.stat-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;transition:all .15s}
+.stat-list{display:flex;flex-direction:column;gap:4px}
+.stat-row{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-radius:var(--r-sm);cursor:pointer;transition:all .15s}
 .stat-row:hover{background:#F9FAFB}
-.stat-row.active{background:var(--text);color:#fff}
-.stat-row.active .sr-label{color:rgba(255,255,255,.7)}
+.stat-row.active{background:var(--text)}
+.stat-row.active .sr-label{color:rgba(255,255,255,.65)}
 .stat-row.active .sr-num{color:#fff}
 .sr-left{display:flex;align-items:center;gap:8px}
-.sr-dot{width:7px;height:7px;border-radius:50%}
-.sr-label{font-size:12px;font-weight:500;color:var(--text2)}
-.sr-num{font-size:16px;font-weight:600;letter-spacing:-.5px}
+.sr-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sr-label{font-size:13px;font-weight:500;color:var(--text2)}
+.sr-num{font-size:17px;font-weight:600;letter-spacing:-.5px}
 .c-danger{color:var(--danger)}.c-success{color:var(--success)}.c-warn{color:var(--warn)}.c-muted{color:var(--text3)}
 
-/* ── RULES CARD ── */
-.rules-card{background:#F9FAFB;border-radius:var(--r);padding:18px;border:1px solid var(--border)}
+.info-card{background:#F9FAFB;border-radius:var(--r);padding:16px;border:1px solid var(--border)}
+.card-title{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.info-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;font-size:12px}
+.info-row:last-child{margin-bottom:0}
+.info-label{color:var(--text2);font-weight:500}
+.info-val{color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px}
+
+.rules-card{background:#F9FAFB;border-radius:var(--r);padding:16px;border:1px solid var(--border)}
 .rule-item{margin-bottom:10px}
 .rule-item:last-child{margin-bottom:0}
-.rule-title{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px}
+.rule-title{font-size:11px;font-weight:600;margin-bottom:2px}
 .rule-body{font-size:11px;color:var(--text2);line-height:1.7}
 
-/* ── RIGHT PANEL ── */
-.right{display:flex;flex-direction:column;gap:12px}
+/* 오른쪽 블록 영역 */
+.ov-right{display:flex;flex-direction:column;gap:12px}
 
-/* ── TABLE CARD ── */
+/* 핵심 지표 3개 가로 배열 */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.kpi-card{background:var(--white);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow-sm);border:1px solid var(--border);cursor:pointer;transition:all .18s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.kpi-card.kc-non{border-top:3px solid var(--danger)}
+.kpi-card.kc-stk{border-top:3px solid var(--success)}
+.kpi-card.kc-wat{border-top:3px solid var(--warn)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.03em;margin-bottom:8px}
+.kpi-num{font-size:40px;font-weight:300;letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.kpi-sub{font-size:11px;color:var(--text3)}
+.kc-non .kpi-num{color:var(--danger)}
+.kc-stk .kpi-num{color:var(--success)}
+.kc-wat .kpi-num{color:var(--warn)}
+
+/* 품목 블록 3단 */
+.item-blocks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.item-block{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
+.ib-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ib-title{font-size:12px;font-weight:600}
+.ib-count{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.ib-non .ib-title{color:var(--danger)}.ib-non .ib-count{background:var(--danger-bg);color:var(--danger)}
+.ib-stk .ib-title{color:var(--success)}.ib-stk .ib-count{background:var(--success-bg);color:var(--success)}
+.ib-wat .ib-title{color:var(--warn)}.ib-wat .ib-count{background:var(--warn-bg);color:var(--warn)}
+.ib-body{max-height:320px;overflow-y:auto}
+.ib-item{padding:10px 16px;border-bottom:1px solid #F3F4F6;cursor:pointer;transition:background .1s}
+.ib-item:last-child{border-bottom:none}
+.ib-item:hover{background:#FAFAFA}
+.ib-code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:2px}
+.ib-name{font-size:12px;font-weight:500;color:var(--text)}
+.ib-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.ib-empty{padding:2rem;text-align:center;font-size:12px;color:var(--text3)}
+
+/* ════════════════════
+   전품목 테이블 패널
+════════════════════ */
+.list-layout{display:grid;grid-template-columns:260px 1fr;gap:16px}
+.list-left{display:flex;flex-direction:column;gap:12px}
 .tbl-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
-.tbl-head{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.tbl-head-title{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.2px}
+.tbl-head{padding:16px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tbl-head-title{font-size:15px;font-weight:600;letter-spacing:-.2px}
 .tbl-head-sub{font-size:12px;color:var(--text3);margin-top:2px}
-.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
 .chip{font-size:11px;font-weight:500;padding:4px 11px;border-radius:99px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s}
 .chip:hover{border-color:#9CA3AF}
 .chip.on-all{background:var(--text);color:#fff;border-color:var(--text)}
@@ -101,14 +134,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .chip.on-stk{background:var(--success-bg);color:var(--success);border-color:var(--success)}
 .chip.on-wat{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
 .tbl-scroll{overflow-x:auto;margin-top:12px}
-table{width:100%;border-collapse:collapse;min-width:860px}
-thead th{padding:9px 16px;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#FAFAFA;white-space:nowrap;text-align:left}
+table{width:100%;border-collapse:collapse;min-width:960px}
+thead th{padding:9px 14px;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#FAFAFA;white-space:nowrap;text-align:left}
 tbody tr{border-bottom:1px solid #F3F4F6;transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:#FAFAFA}
-tbody td{padding:11px 16px;vertical-align:middle}
+tbody td{padding:10px 14px;vertical-align:middle}
 
-/* ── BADGES ── */
+/* ── 공통 컴포넌트 ── */
 .bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:99px}
 .bdg::before{content:'';width:4px;height:4px;border-radius:50%}
 .bdg-non{background:var(--danger-bg);color:var(--danger)}.bdg-non::before{background:var(--danger)}
@@ -118,28 +151,37 @@ tbody td{padding:11px 16px;vertical-align:middle}
 .spl{display:inline-block;font-size:11px;font-weight:500;padding:2px 9px;border-radius:99px}
 .spl-재고{background:var(--accent-bg);color:var(--accent)}
 .spl-비재고{background:#F3F4F6;color:var(--text2)}
-.chain{font-size:10px;font-weight:500;padding:1px 6px;border-radius:99px;background:#FEF9C3;color:#854D0E;margin-left:3px;vertical-align:middle}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2)}
-.muted{color:var(--text3);font-size:13px}
+.muted{color:var(--text3)}
 .fw6{font-weight:600}
 .n-danger{color:var(--danger);font-weight:600}
 .n-warn{color:var(--warn);font-weight:500}
+.n-success{color:var(--success);font-weight:500}
 .cov-hi{color:var(--danger);font-weight:600}
 .cov-md{color:var(--warn);font-weight:500}
 .spark{display:flex;align-items:flex-end;gap:2px;height:22px}
 .spark span{display:inline-block;border-radius:2px;width:5px}
+/* ── 시리즈 차트 ── */
+.series-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:20px 22px}
+.series-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.series-title{font-size:13px;font-weight:600;color:var(--text)}
+.series-legend{display:flex;gap:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.leg-dot{width:8px;height:8px;border-radius:2px}
+.series-bars{display:flex;flex-direction:column;gap:10px}
+.sb-row{display:flex;align-items:center;gap:10px}
+.sb-label{font-size:12px;font-weight:500;color:var(--text2);width:52px;flex-shrink:0}
+.sb-track{flex:1;display:flex;height:20px;border-radius:4px;overflow:hidden;background:#F3F4F6}
+.sb-seg{height:100%;transition:width .4s ease}
+.sb-seg-재고{background:var(--accent-bg)}
+.sb-seg-비재고{background:#F3F4F6}
+.sb-nums{font-size:11px;color:var(--text3);width:64px;text-align:right;flex-shrink:0;font-family:'JetBrains Mono',monospace}
 
-/* ── EMPTY ── */
-.empty-state{padding:5rem 2rem;text-align:center}
-.empty-icon{width:44px;height:44px;background:#F3F4F6;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-.empty-icon svg{width:20px;height:20px;stroke:var(--text3);fill:none;stroke-width:1.8;stroke-linecap:round}
-.empty-state h3{font-size:15px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
-.empty-state p{font-size:13px;color:var(--text2);line-height:1.7;margin:0 auto 18px;max-width:300px}
 
-/* ── PANEL ── */
-.panel{display:none}.panel.active{display:block}
+/* 이력 */
+.hist-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
 
-/* ── GUIDE ── */
+/* 가이드 */
 .guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .guide-item{background:var(--white);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px}
 .guide-item h4{font-size:12px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -147,7 +189,7 @@ tbody td{padding:11px 16px;vertical-align:middle}
 .guide-item p{font-size:11px;color:var(--text2);line-height:1.8}
 .guide-item p strong{color:var(--text);font-weight:600}
 
-/* ── MODAL ── */
+/* 모달 */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-bg.open{display:flex}
 .modal{background:var(--white);border-radius:var(--r);padding:24px;width:440px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.15);border:1px solid var(--border)}
@@ -159,9 +201,15 @@ tbody td{padding:11px 16px;vertical-align:middle}
 .modal textarea{height:76px;resize:vertical}
 .modal-btns{display:flex;gap:7px;justify-content:flex-end;margin-top:18px}
 
-/* ── ANIM ── */
 @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.summary-card,.left .card,.left .rules-card,.right .tbl-card{animation:up .3s ease both}
+.kpi-card{animation:up .3s ease both}
+.kpi-card:nth-child(1){animation-delay:.05s}
+.kpi-card:nth-child(2){animation-delay:.1s}
+.kpi-card:nth-child(3){animation-delay:.15s}
+.item-block{animation:up .3s ease both}
+.item-block:nth-child(1){animation-delay:.15s}
+.item-block:nth-child(2){animation-delay:.2s}
+.item-block:nth-child(3){animation-delay:.25s}
 </style>
 </head>
 <body>
@@ -172,7 +220,8 @@ tbody td{padding:11px 16px;vertical-align:middle}
     <span class="logo-name">SCM Monitor</span>
   </div>
   <div class="nav-links">
-    <div class="nav-link active" onclick="switchTab('monitor')">판정 현황</div>
+    <div class="nav-link active" onclick="switchTab('overview')">대시보드</div>
+    <div class="nav-link" onclick="switchTab('list')">전품목 목록</div>
     <div class="nav-link" onclick="switchTab('history')">전환 이력</div>
     <div class="nav-link" onclick="switchTab('guide')">사용 가이드</div>
   </div>
@@ -189,107 +238,211 @@ tbody td{padding:11px 16px;vertical-align:middle}
   </div>
 </nav>
 
-<div class="layout">
+<div class="page">
 
-  <!-- LEFT -->
-  <div class="left">
-    <div class="summary-card">
-      <div class="summary-main">
-        <div class="big-num" id="big-total">—</div>
-        <div class="big-label" id="last-update">전체 모니터링 품목</div>
-      </div>
-      <div class="divider"></div>
-      <div class="stat-list">
-        <div class="stat-row active" id="sr-all" onclick="setFilter('all')">
-          <div class="sr-left"><div class="sr-dot" style="background:#374151"></div><span class="sr-label">전체</span></div>
-          <span class="sr-num" id="s-all">—</span>
+  <!-- ══ 대시보드 패널 ══ -->
+  <div class="panel active" id="panel-overview">
+    <div class="overview">
+      <!-- 왼쪽 사이드 -->
+      <div class="ov-left">
+        <div class="summary-card">
+          <div class="big-num" id="big-total">—</div>
+          <div class="big-label" id="last-update">전체 모니터링 품목</div>
+          <div class="divider"></div>
+          <div class="stat-list">
+            <div class="stat-row active" id="sr-all" onclick="gotoList('all')">
+              <div class="sr-left"><div class="sr-dot" style="background:#374151"></div><span class="sr-label">전체</span></div>
+              <span class="sr-num" id="s-all">—</span>
+            </div>
+            <div class="stat-row" id="sr-non" onclick="gotoList('to-non')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--danger)"></div><span class="sr-label">비재고 전환 권고</span></div>
+              <span class="sr-num c-danger" id="s-non">—</span>
+            </div>
+            <div class="stat-row" id="sr-stk" onclick="gotoList('to-stock')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--success)"></div><span class="sr-label">재고 전환 권고</span></div>
+              <span class="sr-num c-success" id="s-stk">—</span>
+            </div>
+            <div class="stat-row" id="sr-wat" onclick="gotoList('watch')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--warn)"></div><span class="sr-label">모니터링</span></div>
+              <span class="sr-num c-warn" id="s-wat">—</span>
+            </div>
+            <div class="stat-row" id="sr-ok" onclick="gotoList('ok')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--text3)"></div><span class="sr-label">정상</span></div>
+              <span class="sr-num c-muted" id="s-ok">—</span>
+            </div>
+          </div>
         </div>
-        <div class="stat-row" id="sr-non" onclick="setFilter('to-non')">
-          <div class="sr-left"><div class="sr-dot" style="background:var(--danger)"></div><span class="sr-label">비재고 전환 권고</span></div>
-          <span class="sr-num c-danger" id="s-non">—</span>
-        </div>
-        <div class="stat-row" id="sr-stk" onclick="setFilter('to-stock')">
-          <div class="sr-left"><div class="sr-dot" style="background:var(--success)"></div><span class="sr-label">재고 전환 권고</span></div>
-          <span class="sr-num c-success" id="s-stk">—</span>
-        </div>
-        <div class="stat-row" id="sr-wat" onclick="setFilter('watch')">
-          <div class="sr-left"><div class="sr-dot" style="background:var(--warn)"></div><span class="sr-label">모니터링</span></div>
-          <span class="sr-num c-warn" id="s-wat">—</span>
-        </div>
-        <div class="stat-row" id="sr-ok" onclick="setFilter('ok')">
-          <div class="sr-left"><div class="sr-dot" style="background:var(--text3)"></div><span class="sr-label">정상</span></div>
-          <span class="sr-num c-muted" id="s-ok">—</span>
-        </div>
-      </div>
-    </div>
 
-    <div class="rules-card">
-      <div class="card-title">판정 기준</div>
-      <div class="rule-item">
-        <div class="rule-title" style="color:var(--danger)">비재고 전환 권고</div>
-        <div class="rule-body">재고 운영 + 6개월 평균 ≤ 8개 + 실질재고 ≤ 5개</div>
+        <div class="info-card">
+          <div class="card-title">데이터 현황</div>
+          <div class="info-row"><span class="info-label">실적 기준일</span><span class="info-val" id="info-date">—</span></div>
+          <div class="info-row"><span class="info-label">이력 기간</span><span class="info-val" id="info-period">—</span></div>
+          <div class="info-row"><span class="info-label">당월실적 품목</span><span class="info-val" id="info-cur">—</span></div>
+        </div>
+
+        <div class="rules-card">
+          <div class="card-title">판정 기준</div>
+          <div class="rule-item">
+            <div class="rule-title" style="color:var(--danger)">비재고 전환 권고</div>
+            <div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 8개 + 가용재고 ≤ 5개</div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-title" style="color:var(--success)">재고 전환 권고</div>
+            <div class="rule-body">비재고 운영 + 직전 6개월 평균 ≥ 12개</div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-title" style="color:var(--warn)">모니터링</div>
+            <div class="rule-body">경계 구간(8~10개) 또는 비재고 피크월 ≥ 15개</div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-title">가용재고</div>
+            <div class="rule-body">현재고 − 출고잔량(4주) + 입고잔량(4주)</div>
+          </div>
+        </div>
       </div>
-      <div class="rule-item">
-        <div class="rule-title" style="color:var(--success)">재고 전환 권고</div>
-        <div class="rule-body">비재고 운영 + 6개월 평균 ≥ 12개</div>
-      </div>
-      <div class="rule-item">
-        <div class="rule-title" style="color:var(--warn)">모니터링</div>
-        <div class="rule-body">경계 구간(8~10개) 또는 비재고 피크월 ≥ 15개</div>
-      </div>
-      <div class="rule-item">
-        <div class="rule-title">커버리지</div>
-        <div class="rule-body">실질재고 ÷ 6개월 평균</div>
+
+      <!-- 오른쪽 -->
+      <div class="ov-right">
+        <!-- KPI 3개 -->
+        <div class="kpi-row">
+          <div class="kpi-card kc-non" onclick="gotoList('to-non')">
+            <div class="kpi-label">비재고 전환 권고</div>
+            <div class="kpi-num" id="kpi-non">—</div>
+            <div class="kpi-sub">즉시 검토 필요</div>
+          </div>
+          <div class="kpi-card kc-stk" onclick="gotoList('to-stock')">
+            <div class="kpi-label">재고 전환 권고</div>
+            <div class="kpi-num" id="kpi-stk">—</div>
+            <div class="kpi-sub">수요 증가 감지</div>
+          </div>
+          <div class="kpi-card kc-wat" onclick="gotoList('watch')">
+            <div class="kpi-label">모니터링</div>
+            <div class="kpi-num" id="kpi-wat">—</div>
+            <div class="kpi-sub">경계 구간 품목</div>
+          </div>
+        </div>
+
+        <!-- 품목 블록 3단 -->
+        <div class="item-blocks">
+          <div class="item-block">
+            <div class="ib-header ib-non">
+              <span class="ib-title">비재고 전환 권고</span>
+              <span class="ib-count" id="ib-non-cnt">0</span>
+            </div>
+            <div class="ib-body" id="ib-non-list"></div>
+          </div>
+          <div class="item-block">
+            <div class="ib-header ib-stk">
+              <span class="ib-title">재고 전환 권고</span>
+              <span class="ib-count" id="ib-stk-cnt">0</span>
+            </div>
+            <div class="ib-body" id="ib-stk-list"></div>
+          </div>
+          <div class="item-block">
+            <div class="ib-header ib-wat">
+              <span class="ib-title">모니터링</span>
+              <span class="ib-count" id="ib-wat-cnt">0</span>
+            </div>
+            <div class="ib-body" id="ib-wat-list"></div>
+          </div>
+        </div>
+
+        <!-- 빈 상태 -->
+        <div id="ov-empty" style="display:none;text-align:center;padding:4rem;color:var(--text3)">
+          <p style="font-size:15px;font-weight:500;margin-bottom:8px;color:var(--text2)">Sheets 동기화를 눌러주세요</p>
+          <p style="font-size:13px;margin-bottom:16px">현황·당월실적·전환이력 시트를 한번에 불러옵니다</p>
+          <button class="btn" onclick="loadSample()">샘플 데이터로 보기</button>
+        </div>
+
+        <!-- 시리즈별 재고/비재고 현황 -->
+        <div class="series-card">
+          <div class="series-header">
+            <span class="series-title">시리즈별 재고/비재고 현황</span>
+            <div class="series-legend">
+              <div class="leg-item"><div class="leg-dot" style="background:var(--accent)"></div>재고</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#D1D5DB"></div>비재고</div>
+            </div>
+          </div>
+          <div class="series-bars" id="series-chart"></div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <!-- RIGHT -->
-  <div class="right">
-
-    <!-- 판정 현황 -->
-    <div class="panel active" id="panel-monitor">
-      <div id="main-area">
-        <div class="tbl-card">
-          <div class="empty-state">
-            <div class="empty-icon"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5"/><path d="M10 6.5v4M10 12.5h.01"/></svg></div>
-            <h3>재고유형 판정 모니터링</h3>
-            <p>Sheets 동기화 버튼을 눌러<br>데이터를 불러오세요</p>
-            <button class="btn" onclick="loadSample()">샘플 데이터로 보기</button>
+  <!-- ══ 전품목 목록 패널 ══ -->
+  <div class="panel" id="panel-list">
+    <div class="list-layout">
+      <!-- 왼쪽 필터 사이드 (대시보드와 공유) -->
+      <div class="list-left">
+        <div class="summary-card">
+          <div class="big-num" id="big-total2">—</div>
+          <div class="big-label">전체 모니터링 품목</div>
+          <div class="divider"></div>
+          <div class="stat-list">
+            <div class="stat-row active" id="lr-all" onclick="setFilter('all')">
+              <div class="sr-left"><div class="sr-dot" style="background:#374151"></div><span class="sr-label">전체</span></div>
+              <span class="sr-num" id="ls-all">—</span>
+            </div>
+            <div class="stat-row" id="lr-non" onclick="setFilter('to-non')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--danger)"></div><span class="sr-label">비재고 전환 권고</span></div>
+              <span class="sr-num c-danger" id="ls-non">—</span>
+            </div>
+            <div class="stat-row" id="lr-stk" onclick="setFilter('to-stock')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--success)"></div><span class="sr-label">재고 전환 권고</span></div>
+              <span class="sr-num c-success" id="ls-stk">—</span>
+            </div>
+            <div class="stat-row" id="lr-wat" onclick="setFilter('watch')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--warn)"></div><span class="sr-label">모니터링</span></div>
+              <span class="sr-num c-warn" id="ls-wat">—</span>
+            </div>
+            <div class="stat-row" id="lr-ok" onclick="setFilter('ok')">
+              <div class="sr-left"><div class="sr-dot" style="background:var(--text3)"></div><span class="sr-label">정상</span></div>
+              <span class="sr-num c-muted" id="ls-ok">—</span>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- 전환 이력 -->
-    <div class="panel" id="panel-history">
-      <div class="tbl-card">
-        <div class="tbl-head">
-          <div>
-            <div class="tbl-head-title">전환 이력</div>
-          </div>
+        <div class="rules-card">
+          <div class="card-title">판정 기준</div>
+          <div class="rule-item"><div class="rule-title" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 8개 + 가용재고 ≤ 5개</div></div>
+          <div class="rule-item"><div class="rule-title" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 ≥ 12개</div></div>
+          <div class="rule-item"><div class="rule-title" style="color:var(--warn)">모니터링</div><div class="rule-body">경계 구간(8~10개) 또는 비재고 피크월 ≥ 15개</div></div>
+          <div class="rule-item"><div class="rule-title">가용재고</div><div class="rule-body">현재고 − 출고잔량(4주) + 입고잔량(4주)</div></div>
         </div>
-        <div class="tbl-scroll">
-          <table>
-            <thead><tr><th>날짜</th><th>단품구분자</th><th>단품명</th><th>이전</th><th>변경</th><th>사유</th><th>담당자</th></tr></thead>
-            <tbody id="history-body">
-              <tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text3)">Sheets 동기화 시 표시됩니다</td></tr>
-            </tbody>
-          </table>
+      </div>
+
+      <!-- 테이블 -->
+      <div id="list-area">
+        <div class="tbl-card" style="padding:4rem 2rem;text-align:center;color:var(--text3)">
+          <p>Sheets 동기화 후 표시됩니다</p>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- 가이드 -->
-    <div class="panel" id="panel-guide">
-      <div class="guide-grid">
-        <div class="guide-item"><h4><span class="g-num">1</span>재고구분_현황</h4><p>단품구분자, 단품명, 시리즈, 공급처, <strong>재고구분</strong>, 기준일</p></div>
-        <div class="guide-item"><h4><span class="g-num">2</span>출고재고</h4><p>단품구분자, 연월(2026-04), 출고량, 현재고, 출고잔량<br><strong>현재고·출고잔량은 당월만 입력</strong></p></div>
-        <div class="guide-item"><h4><span class="g-num">3</span>코드변경이력</h4><p>구코드, 신코드<br>A→A'→A'' 체인 누적<br><strong>구코드 출고량 자동 합산</strong></p></div>
-        <div class="guide-item"><h4><span class="g-num">4</span>재고구분_전환이력</h4><p>날짜, 단품구분자, 이전상태, 변경상태, 사유, 담당자<br>이력 기록 → CSV → 시트 붙여넣기</p></div>
+  <!-- ══ 전환 이력 패널 ══ -->
+  <div class="panel" id="panel-history">
+    <div class="hist-card">
+      <div class="tbl-head" style="padding:16px 20px"><div class="tbl-head-title">전환 이력</div></div>
+      <div class="tbl-scroll">
+        <table>
+          <thead><tr><th>날짜</th><th>단품구분자</th><th>단품명</th><th>이전</th><th>변경</th><th>사유</th><th>담당자</th></tr></thead>
+          <tbody id="history-body">
+            <tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text3)">Sheets 동기화 시 표시됩니다</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
 
+  <!-- ══ 가이드 패널 ══ -->
+  <div class="panel" id="panel-guide">
+    <div class="guide-grid">
+      <div class="guide-item"><h4><span class="g-num">1</span>재고구분_현황</h4><p>단품구분자, 단품명, 시리즈, 공급처, 재고구분, 운영등급, 기준일<br>이후 <strong>yyyy-mm 형식 컬럼 = 월별 출고량</strong> (자동 인식)</p></div>
+      <div class="guide-item"><h4><span class="g-num">2</span>당월실적</h4><p>단품구분자, 현재고, 당월출고량, 입고잔량(4주), 출고잔량(4주), 실적기준일<br><strong>매주 업데이트</strong></p></div>
+      <div class="guide-item"><h4><span class="g-num">3</span>재고구분_전환이력</h4><p>날짜, 단품구분자, 이전상태, 변경상태, 사유, 담당자</p></div>
+      <div class="guide-item"><h4><span class="g-num">4</span>운영 주기</h4><p><strong>매주:</strong> 당월실적 업데이트 → Sheets 동기화<br><strong>매월:</strong> 재고구분_현황 yyyy-mm 열 추가</p></div>
+    </div>
   </div>
 </div>
 
@@ -311,27 +464,30 @@ tbody td{padding:11px 16px;vertical-align:middle}
 
 <script>
 const SHEET_ID='1ivNPbJSqoabJhVkrNV68ASADRN_6iAPsWawe54P69Jk';
-const SH={현황:'재고구분_현황',이력:'재고구분_전환이력',출고재고:'출고재고',코드변경:'코드변경이력'};
-let masterData={},codeChain={},allData=[],activeFilter='all',pendingRecord=null;
+const SH={현황:'재고구분_현황',이력:'재고구분_전환이력',당월:'당월실적'};
+const META_COLS=['단품구분자','단품명','시리즈','공급처','재고구분','운영등급','기준일'];
+const MONTH_RE=/^\d{4}-\d{2}$/;
+
+let masterData={},당월Data={},allData=[],activeFilter='all',pendingRecord=null;
 
 function judge(r){
-  const real=Math.max(0,r.현재고-r.출고잔량);
-  if(r.상태==='재고'&&r.avg6<=8&&real<=5)return'to-non';
-  if(r.상태==='비재고'&&r.avg6>=12)return'to-stock';
-  if(r.상태==='재고'&&r.avg6>8&&r.avg6<10)return'watch';
-  if(r.상태==='재고'&&r.avg6<=8&&real>5)return'watch';
-  if(r.상태==='비재고'&&r.peak>=15)return'watch';
+  const avail=Math.max(0,r.현재고-r.출고잔량+r.입고잔량);
+  if(r.상태==='재고'  &&r.avg6<=8 &&avail<=5)return'to-non';
+  if(r.상태==='비재고'&&r.avg6>=12)           return'to-stock';
+  if(r.상태==='재고'  &&r.avg6>8  &&r.avg6<10) return'watch';
+  if(r.상태==='재고'  &&r.avg6<=8 &&avail>5)  return'watch';
+  if(r.상태==='비재고'&&r.peak>=15)            return'watch';
   return'ok';
 }
 
 function bdg(j){return{'to-non':'<span class="bdg bdg-non">비재고 전환 권고</span>','to-stock':'<span class="bdg bdg-stk">재고 전환 권고</span>','watch':'<span class="bdg bdg-wat">모니터링</span>','ok':'<span class="bdg bdg-ok">정상</span>'}[j]||'';}
 
-function spark(months){
-  const max=Math.max(...months,1);
-  return'<div class="spark">'+months.map(v=>{
-    const h=Math.max(3,Math.round((v/max)*22));
-    const c=v>10?'var(--danger)':v>6?'var(--warn)':'var(--accent)';
-    return`<span style="height:${h}px;background:${c}"></span>`;
+function spark(months,cur){
+  const all=[...months,cur];const max=Math.max(...all,1);
+  return'<div class="spark">'+all.map((v,i)=>{
+    const h=Math.max(3,Math.round((v/max)*22));const isCur=i===all.length-1;
+    const c=isCur?'var(--text)':(v>10?'var(--danger)':v>6?'var(--warn)':'var(--accent)');
+    return`<span style="height:${h}px;background:${c};opacity:${isCur?1:.7}"></span>`;
   }).join('')+'</div>';
 }
 
@@ -349,29 +505,29 @@ async function fetchSheet(name){
   if(!res.ok)throw new Error();return parseCSV(await res.text());
 }
 
-function buildChain(rows){
-  const fwd={};rows.forEach(r=>{if(r['구코드']&&r['신코드'])fwd[r['구코드']]=r['신코드'];});
-  const chain={};new Set(Object.values(fwd)).forEach(neo=>{
-    const anc=[];let cur=neo;const seen=new Set();
-    while(true){const p=Object.keys(fwd).find(k=>fwd[k]===cur);if(!p||seen.has(p))break;seen.add(p);anc.push(p);cur=p;}
-    if(anc.length)chain[neo]=anc;
-  });return chain;
-}
+function buildAllData(){
+  let allMonthKeys=new Set();
+  Object.values(masterData).forEach(m=>Object.keys(m).filter(k=>MONTH_RE.test(k)).forEach(k=>allMonthKeys.add(k)));
+  const sortedMonths=[...allMonthKeys].sort();
+  const last6=sortedMonths.slice(-6);
+  if(sortedMonths.length>0) document.getElementById('info-period').textContent=`${sortedMonths[0]} ~ ${sortedMonths[sortedMonths.length-1]}`;
 
-function processRows(rows,chain){
-  const grp={};
-  rows.forEach(r=>{const c=r['단품구분자'];if(!c)return;if(!grp[c])grp[c]=[];grp[c].push({연월:r['연월']||'',출고량:parseFloat(r['출고량'])||0,현재고:parseFloat(r['현재고'])||0,출고잔량:parseFloat(r['출고잔량'])||0});});
-  return Object.keys(grp).filter(code=>!Object.values(chain).some(a=>a.includes(code))).map(code=>{
-    const entries=[...grp[code]];
-    const anc=chain[code]||[];
-    anc.forEach(old=>{(grp[old]||[]).forEach(e=>{const ex=entries.find(x=>x.연월===e.연월);if(ex)ex.출고량+=e.출고량;else entries.push({...e,현재고:0,출고잔량:0});});});
-    entries.sort((a,b)=>a.연월.localeCompare(b.연월));
-    const l6=entries.slice(-6).map(e=>e.출고량);
-    const avg6=l6.length?l6.reduce((a,b)=>a+b,0)/l6.length:0;
-    const peak=Math.max(...entries.map(e=>e.출고량),0);
-    const lat=entries[entries.length-1];
-    const m=masterData[code]||{};
-    const rec={code,name:m['단품명']||code,시리즈:m['시리즈']||'',상태:m['재고구분']||'재고',avg6,peak,현재고:lat?.현재고||0,출고잔량:lat?.출고잔량||0,months:l6,ancestors:anc,verdict:'ok'};
+  return Object.entries(masterData).map(([code,m])=>{
+    const l6vals=last6.map(k=>parseFloat(m[k])||0);
+    const avg6=l6vals.length?l6vals.reduce((a,b)=>a+b,0)/l6vals.length:0;
+    const allVals=sortedMonths.map(k=>parseFloat(m[k])||0);
+    const peak=allVals.length?Math.max(...allVals):0;
+    const cur=당월Data[code]||{};
+    const 현재고=parseFloat(cur['현재고'])||0;
+    const 당월출고=parseFloat(cur['당월출고량'])||0;
+    const 입고잔량=parseFloat(cur['입고잔량(4주)'])||0;
+    const 출고잔량=parseFloat(cur['출고잔량(4주)'])||0;
+    const 실적기준일=cur['실적기준일']||'';
+    const avail=Math.max(0,현재고-출고잔량+입고잔량);
+    const cov=avg6>0?avail/avg6:0;
+    const rec={code,name:m['단품명']||code,시리즈:m['시리즈']||'',공급처:m['공급처']||'',
+      상태:m['재고구분']||'재고',운영등급:m['운영등급']||'',기준일:m['기준일']||'',
+      avg6,peak,months:l6vals,당월출고,현재고,입고잔량,출고잔량,avail,cov,실적기준일,verdict:'ok'};
     rec.verdict=judge(rec);return rec;
   });
 }
@@ -379,16 +535,87 @@ function processRows(rows,chain){
 async function syncAll(){
   const st=document.getElementById('sync-st');st.textContent='동기화 중...';
   try{
-    const[현황,출고,코드,이력]=await Promise.all([fetchSheet(SH.현황),fetchSheet(SH.출고재고),fetchSheet(SH.코드변경),fetchSheet(SH.이력)]);
-    masterData={};현황.forEach(r=>{if(r['단품구분자'])masterData[r['단품구분자']]=r;});
-    codeChain=buildChain(코드);allData=processRows(출고,codeChain);activeFilter='all';
+    const[현황rows,당월rows,이력rows]=await Promise.all([fetchSheet(SH.현황),fetchSheet(SH.당월),fetchSheet(SH.이력)]);
+    masterData={};현황rows.forEach(r=>{if(r['단품구분자'])masterData[r['단품구분자']]=r;});
+    당월Data={};당월rows.forEach(r=>{if(r['단품구분자'])당월Data[r['단품구분자']]=r;});
+    allData=buildAllData();activeFilter='all';
+    const dates=[...new Set(Object.values(당월Data).map(r=>r['실적기준일']).filter(Boolean))].sort();
+    document.getElementById('info-date').textContent=dates[dates.length-1]||'—';
+    document.getElementById('info-cur').textContent=`${Object.keys(당월Data).length}개`;
     const now=new Date();
     const ts=`${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`;
     document.getElementById('last-update').textContent=`동기화 ${ts}`;
     st.textContent='완료';setTimeout(()=>st.textContent='',3000);
-    render(allData);renderHistory(이력);
+    renderAll();renderHistory(이력rows);
     document.getElementById('export-btn').style.display='inline-flex';
+    document.getElementById('ov-empty').style.display='none';
   }catch(e){st.textContent='실패 — Sheets 공개 설정 확인';setTimeout(()=>st.textContent='',5000);}
+}
+
+function renderAll(){
+  const cnt={all:allData.length,'to-non':allData.filter(r=>r.verdict==='to-non').length,'to-stock':allData.filter(r=>r.verdict==='to-stock').length,watch:allData.filter(r=>r.verdict==='watch').length,ok:allData.filter(r=>r.verdict==='ok').length};
+
+  // 통계 업데이트 (대시보드 + 목록 양쪽)
+  ['big-total','big-total2'].forEach(id=>document.getElementById(id).textContent=cnt.all);
+  [['s-all','ls-all','all'],['s-non','ls-non','to-non'],['s-stk','ls-stk','to-stock'],['s-wat','ls-wat','watch'],['s-ok','ls-ok','ok']]
+    .forEach(([id1,id2,k])=>{document.getElementById(id1).textContent=cnt[k];document.getElementById(id2).textContent=cnt[k];});
+
+  // KPI
+  document.getElementById('kpi-non').textContent=cnt['to-non'];
+  document.getElementById('kpi-stk').textContent=cnt['to-stock'];
+  document.getElementById('kpi-wat').textContent=cnt.watch;
+
+
+  // 시리즈별 차트
+  renderSeriesChart(allData);
+  // 품목 블록
+  renderBlock('ib-non-list','ib-non-cnt',allData.filter(r=>r.verdict==='to-non'));
+  renderBlock('ib-stk-list','ib-stk-cnt',allData.filter(r=>r.verdict==='to-stock'));
+  renderBlock('ib-wat-list','ib-wat-cnt',allData.filter(r=>r.verdict==='watch'));
+
+  // 목록 사이드 필터 active 동기화
+  updateListSideActive();
+  renderList();
+}
+
+
+function renderSeriesChart(data){
+  const el=document.getElementById('series-chart');
+  if(!el)return;
+  // 시리즈별 집계
+  const map={};
+  data.forEach(r=>{
+    const s=r.시리즈||'기타';
+    if(!map[s])map[s]={재고:0,비재고:0};
+    map[s][r.상태==='재고'?'재고':'비재고']++;
+  });
+  const series=Object.entries(map).sort((a,b)=>((b[1].재고+b[1].비재고)-(a[1].재고+a[1].비재고)));
+  const maxTotal=Math.max(...series.map(([,v])=>v.재고+v.비재고),1);
+  el.innerHTML=series.map(([name,v])=>{
+    const total=v.재고+v.비재고;
+    const wStock=Math.round((v.재고/maxTotal)*100);
+    const wNon=Math.round((v.비재고/maxTotal)*100);
+    return`<div class="sb-row">
+      <div class="sb-label">${name}</div>
+      <div class="sb-track">
+        <div class="sb-seg" style="width:${wStock}%;background:var(--accent-bg);border-right:${v.재고&&v.비재고?'1px solid #e5e7eb':'none'}"></div>
+        <div class="sb-seg" style="width:${wNon}%;background:#E5E7EB"></div>
+      </div>
+      <div class="sb-nums"><span style="color:var(--accent)">${v.재고}</span> / <span style="color:var(--text3)">${v.비재고}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderBlock(listId,cntId,items){
+  document.getElementById(cntId).textContent=items.length;
+  const el=document.getElementById(listId);
+  if(!items.length){el.innerHTML='<div class="ib-empty">해당 없음</div>';return;}
+  el.innerHTML=items.map(r=>`
+    <div class="ib-item" onclick="gotoList('${r.verdict}')">
+      <div class="ib-code">${r.code}</div>
+      <div class="ib-name">${r.name}</div>
+      <div class="ib-meta">${r.시리즈} · 직전6개월평균 ${r.avg6.toFixed(1)}개 · 가용재고 ${r.avail}개</div>
+    </div>`).join('');
 }
 
 function renderHistory(rows){
@@ -401,75 +628,76 @@ function renderHistory(rows){
   }).join('');
 }
 
-function updateStats(cnt){
-  document.getElementById('big-total').textContent=cnt.all;
-  ['all','non','stk','wat','ok'].forEach(k=>document.getElementById('s-'+k).textContent=cnt[{all:'all',non:'to-non',stk:'to-stock',wat:'watch',ok:'ok'}[k]]);
-  const map={all:'sr-all','to-non':'sr-non','to-stock':'sr-stk',watch:'sr-wat',ok:'sr-ok'};
-  Object.values(map).forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById(map[activeFilter]).classList.add('active');
+function updateListSideActive(){
+  const map={all:'lr-all','to-non':'lr-non','to-stock':'lr-stk',watch:'lr-wat',ok:'lr-ok'};
+  Object.values(map).forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  document.getElementById(map[activeFilter])?.classList.add('active');
 }
 
-function render(data){
-  const filtered=activeFilter==='all'?data:data.filter(r=>r.verdict===activeFilter);
-  const cnt={all:data.length,'to-non':data.filter(r=>r.verdict==='to-non').length,'to-stock':data.filter(r=>r.verdict==='to-stock').length,watch:data.filter(r=>r.verdict==='watch').length,ok:data.filter(r=>r.verdict==='ok').length};
-  updateStats(cnt);
-  document.getElementById('export-btn').style.display=data.length?'inline-flex':'none';
-
+function renderList(){
+  const filtered=activeFilter==='all'?allData:allData.filter(r=>r.verdict===activeFilter);
   function cCls(f){const m={all:'chip on-all','to-non':'chip on-non','to-stock':'chip on-stk',watch:'chip on-wat'};return activeFilter===f?(m[f]||'chip'):'chip';}
+  const cnt={all:allData.length,'to-non':allData.filter(r=>r.verdict==='to-non').length,'to-stock':allData.filter(r=>r.verdict==='to-stock').length,watch:allData.filter(r=>r.verdict==='watch').length};
 
-  const rows=filtered.length===0
-    ?`<tr><td colspan="13" style="text-align:center;padding:3rem;color:var(--text3)">해당 항목 없음</td></tr>`
+  const rows=!filtered.length
+    ?`<tr><td colspan="15" style="text-align:center;padding:3rem;color:var(--text3)">해당 항목 없음</td></tr>`
     :filtered.map(r=>{
-      const real=Math.max(0,r.현재고-r.출고잔량);
-      const cov=r.avg6>0?real/r.avg6:0;
-      const covC=cov>6?'cov-hi':cov>3?'cov-md':'';
       const avgC=r.avg6>10?'n-danger':r.avg6>6?'n-warn':'fw6';
-      const ch=r.ancestors?.length?`<span class="chain">+${r.ancestors.length}</span>`:'';
+      const curC=r.당월출고>10?'n-danger':r.당월출고>6?'n-warn':'fw6';
+      const covC=r.cov>6?'cov-hi':r.cov>3?'cov-md':'';
       return`<tr>
-        <td><span class="mono">${r.code}</span>${ch}</td>
+        <td class="mono">${r.code}</td>
         <td style="font-weight:500;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px" title="${r.name}">${r.name}</td>
         <td class="muted">${r.시리즈}</td>
+        <td class="muted">${r.운영등급}</td>
         <td><span class="spl spl-${r.상태}">${r.상태}</span></td>
         <td class="${avgC}">${r.avg6.toFixed(1)}</td>
+        <td class="${curC}">${r.당월출고}</td>
         <td class="muted">${r.peak}</td>
         <td class="fw6">${r.현재고}</td>
+        <td class="n-success">${r.입고잔량}</td>
         <td class="muted">${r.출고잔량}</td>
-        <td class="fw6">${real}</td>
-        <td class="${covC}">${cov.toFixed(1)}개월</td>
-        <td>${spark(r.months)}</td>
+        <td class="fw6">${r.avail}</td>
+        <td class="${covC}">${r.cov.toFixed(1)}개월</td>
+        <td>${spark(r.months,r.당월출고)}</td>
         <td>${bdg(r.verdict)}</td>
-        <td><button class="btn btn-sm" onclick="openModal('${r.code}','${r.name.replace(/'/g,"\\'")}','${r.상태}')">기록</button></td>
       </tr>`;
     }).join('');
 
-  document.getElementById('main-area').innerHTML=`
+  document.getElementById('list-area').innerHTML=`
     <div class="tbl-card">
       <div class="tbl-head">
-        <div>
-          <div class="tbl-head-title">재고유형 판정 모니터링</div>
-          <div class="tbl-head-sub">${filtered.length}개 품목</div>
-        </div>
+        <div><div class="tbl-head-title">전체 품목</div><div class="tbl-head-sub">${filtered.length}개</div></div>
         <div class="chips">
-          <span class="${cCls('all')}" onclick="setFilter('all')">전체 ${cnt.all}</span>
-          <span class="${cCls('to-non')}" onclick="setFilter('to-non')">비재고 전환 ${cnt['to-non']}</span>
+          <span class="${cCls('all')}"      onclick="setFilter('all')">전체 ${cnt.all}</span>
+          <span class="${cCls('to-non')}"   onclick="setFilter('to-non')">비재고 전환 ${cnt['to-non']}</span>
           <span class="${cCls('to-stock')}" onclick="setFilter('to-stock')">재고 전환 ${cnt['to-stock']}</span>
-          <span class="${cCls('watch')}" onclick="setFilter('watch')">모니터링 ${cnt.watch}</span>
+          <span class="${cCls('watch')}"    onclick="setFilter('watch')">모니터링 ${cnt.watch}</span>
         </div>
       </div>
       <div class="tbl-scroll">
         <table>
-          <thead><tr><th>단품구분자</th><th>단품명</th><th>시리즈</th><th>상태</th><th>6개월 평균</th><th>최대월</th><th>현재고</th><th>출고잔량</th><th>실질재고</th><th>커버리지</th><th>추이</th><th>판정</th><th></th></tr></thead>
+          <thead><tr>
+            <th>단품구분자</th><th>단품명</th><th>시리즈</th><th>운영등급</th><th>상태</th>
+            <th>직전6개월 평균</th><th>당월출고</th><th>피크월</th>
+            <th>현재고</th><th>입고잔량</th><th>출고잔량</th><th>가용재고</th>
+            <th>커버리지</th><th>추이(6+당월)</th><th>판정</th>
+          </tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
     </div>`;
 }
 
-function setFilter(f){activeFilter=f;render(allData);}
+function setFilter(f){activeFilter=f;updateListSideActive();renderList();}
+
+function gotoList(f){activeFilter=f;switchTab('list');}
 
 function switchTab(t){
-  document.querySelectorAll('.nav-link').forEach((el,i)=>el.classList.toggle('active',['monitor','history','guide'][i]===t));
-  ['monitor','history','guide'].forEach(p=>document.getElementById('panel-'+p).classList.toggle('active',p===t));
+  const tabs=['overview','list','history','guide'];
+  document.querySelectorAll('.nav-link').forEach((el,i)=>el.classList.toggle('active',tabs[i]===t));
+  tabs.forEach(p=>document.getElementById('panel-'+p).classList.toggle('active',p===t));
+  if(t==='list'){updateListSideActive();renderList();}
 }
 
 function openModal(code,name,status){
@@ -495,27 +723,45 @@ function submitHistory(){
 }
 
 function exportCSV(){
-  const h=['단품구분자','단품명','시리즈','운영상태','6개월평균','최대월','현재고','출고잔량','실질재고','커버리지','판정','구코드합산'];
-  const rows=allData.map(r=>{const real=Math.max(0,r.현재고-r.출고잔량);const cov=r.avg6>0?(real/r.avg6).toFixed(1):'0';return[r.code,r.name,r.시리즈,r.상태,r.avg6.toFixed(1),r.peak,r.현재고,r.출고잔량,real,cov,{'to-non':'비재고 전환 권고','to-stock':'재고 전환 권고',watch:'모니터링',ok:'정상'}[r.verdict],r.ancestors?.join('|')||''];});
+  const h=['단품구분자','단품명','시리즈','운영등급','상태','직전6개월평균','당월출고','피크월','현재고','입고잔량','출고잔량','가용재고','커버리지','판정'];
+  const rows=allData.map(r=>[r.code,r.name,r.시리즈,r.운영등급,r.상태,r.avg6.toFixed(1),r.당월출고,r.peak,r.현재고,r.입고잔량,r.출고잔량,r.avail,r.cov.toFixed(1),{'to-non':'비재고 전환 권고','to-stock':'재고 전환 권고',watch:'모니터링',ok:'정상'}[r.verdict]]);
   const csv='\uFEFF'+[h,...rows].map(x=>x.join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`재고전환판정_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 }
 
 function loadSample(){
-  masterData={'SLFC0110A-NWW':{단품명:'아콘프레임 상판 SS',시리즈:'아콘',재고구분:'재고'},'SLFC0150A-OCY':{단품명:'아콘프레임 상판 Q',시리즈:'아콘',재고구분:'재고'},'SLFE0110A-TL':{단품명:'아몬드 바닥판A SS',시리즈:'아몬드',재고구분:'재고'},'SLFF0150A-NK':{단품명:'버치 베이스 Q',시리즈:'버치',재고구분:'비재고'},'SLFE0165A-TL':{단품명:'아몬드 바닥판A K',시리즈:'아몬드',재고구분:'비재고'},'SLFN0110BR1-OCY':{단품명:'아티초크 바닥판B SS',시리즈:'아티초크',재고구분:'재고'},'SLFE0110A-NEW':{단품명:'아몬드 바닥판A SS (신)',시리즈:'아몬드',재고구분:'재고'}};
-  codeChain={'SLFE0110A-NEW':['SLFE0110A-TL']};
-  const raw=[{code:'SLFC0110A-NWW',months:[10,8,11,9,10,7],현재고:15,출고잔량:3},{code:'SLFC0150A-OCY',months:[3,4,2,3,3,4],현재고:6,출고잔량:1},{code:'SLFE0110A-NEW',months:[5,4,6,5,6,4],현재고:8,출고잔량:2,ancestors:['SLFE0110A-TL']},{code:'SLFF0150A-NK',months:[4,2,3,5,3,4],현재고:0,출고잔량:0},{code:'SLFE0165A-TL',months:[5,6,7,5,6,5],현재고:0,출고잔량:0},{code:'SLFN0110BR1-OCY',months:[25,22,28,24,27,26],현재고:12,출고잔량:5}].map(r=>{
-    const m=masterData[r.code]||{};const avg6=r.months.reduce((a,b)=>a+b,0)/r.months.length;const peak=Math.max(...r.months);
-    const rec={code:r.code,name:m['단품명']||r.code,시리즈:m['시리즈']||'',상태:m['재고구분']||'재고',avg6,peak,현재고:r.현재고,출고잔량:r.출고잔량,months:r.months,ancestors:r.ancestors||[],verdict:'ok'};
-    rec.verdict=judge(rec);return rec;
-  });
-  allData=raw;activeFilter='all';
+  masterData={
+    'SLFC0110A-NWW':{단품명:'아콘프레임 상판 SS',시리즈:'아콘',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':10,'2025-11':8,'2025-12':11,'2026-01':9,'2026-02':10,'2026-03':7},
+    'SLFC0150A-OCY':{단품명:'아콘프레임 상판 Q',시리즈:'아콘',공급처:'충주1공장',재고구분:'재고',운영등급:'B','2025-10':3,'2025-11':4,'2025-12':2,'2026-01':3,'2026-02':3,'2026-03':4},
+    'SLFE0110A-TL': {단품명:'아몬드 바닥판A SS',시리즈:'아몬드',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':13,'2025-11':10,'2025-12':12,'2026-01':11,'2026-02':14,'2026-03':8},
+    'SLFF0150A-NK': {단품명:'버치 베이스 Q',시리즈:'버치',공급처:'충주1공장',재고구분:'비재고',운영등급:'B','2025-10':4,'2025-11':2,'2025-12':3,'2026-01':5,'2026-02':3,'2026-03':4},
+    'SLFE0165A-TL': {단품명:'아몬드 바닥판A K',시리즈:'아몬드',공급처:'충주1공장',재고구분:'비재고',운영등급:'C','2025-10':5,'2025-11':6,'2025-12':7,'2026-01':5,'2026-02':6,'2026-03':5},
+    'SLFN0110BR1-OCY':{단품명:'아티초크 바닥판B SS',시리즈:'아티초크',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':25,'2025-11':22,'2025-12':28,'2026-01':24,'2026-02':27,'2026-03':26},
+  };
+  당월Data={
+    'SLFC0110A-NWW':{현재고:'15','당월출고량':'4','입고잔량(4주)':'5','출고잔량(4주)':'3',실적기준일:'2026-04-06'},
+    'SLFC0150A-OCY':{현재고:'6','당월출고량':'2','입고잔량(4주)':'0','출고잔량(4주)':'1',실적기준일:'2026-04-06'},
+    'SLFE0110A-TL': {현재고:'8','당월출고량':'5','입고잔량(4주)':'3','출고잔량(4주)':'2',실적기준일:'2026-04-06'},
+    'SLFF0150A-NK': {현재고:'0','당월출고량':'13','입고잔량(4주)':'0','출고잔량(4주)':'0',실적기준일:'2026-04-06'},
+    'SLFE0165A-TL': {현재고:'0','당월출고량':'6','입고잔량(4주)':'0','출고잔량(4주)':'0',실적기준일:'2026-04-06'},
+    'SLFN0110BR1-OCY':{현재고:'12','당월출고량':'18','입고잔량(4주)':'0','출고잔량(4주)':'5',실적기준일:'2026-04-06'},
+  };
+  allData=buildAllData();activeFilter='all';
   document.getElementById('last-update').textContent='샘플 데이터 표시 중';
+  document.getElementById('info-date').textContent='2026-04-06';
+  document.getElementById('info-cur').textContent=`${Object.keys(당월Data).length}개`;
   document.getElementById('export-btn').style.display='inline-flex';
-  render(allData);
+  document.getElementById('ov-empty').style.display='none';
+  renderAll();renderHistory([]);
 }
 
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+
+// 초기 빈 상태
+document.getElementById('ov-empty').style.display='block';
+['ib-non-list','ib-stk-list','ib-wat-list'].forEach(id=>{
+  document.getElementById(id).innerHTML='<div class="ib-empty">동기화 후 표시됩니다</div>';
+});
 </script>
 </body>
 </html>
