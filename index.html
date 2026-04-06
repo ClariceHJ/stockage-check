@@ -444,9 +444,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
           <div class="rules-card">
             <div class="info-card-title">판정 기준</div>
-            <div class="rule-item"><div class="rule-ttl" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개</div></div>
+            <div class="rule-item"><div class="rule-ttl" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개 + 수요모멘텀 ≤ 1.5</div></div>
             <div class="rule-item"><div class="rule-ttl" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 > 10개</div></div>
-            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">비재고: 피크 > 12개, 복합리스크, 또는 트렌드↑</div></div>
+            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">비재고: 피크 > 12개, 복합리스크, 트렌드↑, 또는 수요모멘텀 > 1.5<br>재고: avg6 ≤ 10이나 수요모멘텀 > 1.5 (전환 보류) / avg6 > 10이나 수요모멘텀 > 2.0</div></div>
           </div>
         </div>
         <div id="list-area">
@@ -476,7 +476,7 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
     <div class="panel" id="panel-guide">
       <div class="guide-grid">
         <div class="guide-item"><h4><span class="g-num">1</span>재고구분_현황</h4><p>단품구분자, 단품명, 사이즈, 시리즈, 공급처, 재고구분, 운영등급, 운영방침, 운영방침_사유, 기준일<br>이후 <strong>yyyy-mm 형식 컬럼 = 월별 출고량</strong> (자동 인식)</p></div>
-        <div class="guide-item"><h4><span class="g-num">2</span>당월실적</h4><p>단품구분자, 현재고, 당월출고량, 입고잔량(4주), 출고잔량(4주), 실적기준일<br><strong>매주 업데이트</strong></p></div>
+        <div class="guide-item"><h4><span class="g-num">2</span>당월실적</h4><p>단품구분자, 현재고, 당월출고량, 출고잔량(4주), 실적기준일<br><strong>매주 업데이트</strong></p></div>
         <div class="guide-item"><h4><span class="g-num">3</span>재고구분_전환이력</h4><p>날짜, 단품구분자, 이전상태, 변경상태, 사유, 담당자</p></div>
         <div class="guide-item"><h4><span class="g-num">4</span>운영 주기</h4><p><strong>매주:</strong> 당월실적 업데이트 → Sheets 동기화<br><strong>매월:</strong> 재고구분_현황 yyyy-mm 열 추가</p></div>
       </div>
@@ -516,13 +516,20 @@ function judge(r) {
   const avg전 = 전반.length ? 전반.reduce((a,b)=>a+b,0)/전반.length : 0;
   const avg후 = 후반.length ? 후반.reduce((a,b)=>a+b,0)/후반.length : 0;
   const 트렌드 = avg후 > avg전 * 1.2 && avg후 > 3;
+  const m = r.수요모멘텀 || 0;  // 출고잔량 / (avg6/4)
+
   if (r.상태 === '재고') {
-    if (r.avg6 <= 10) return 'to-non';
+    if (r.avg6 <= 10) {
+      if (m > 1.5) return 'watch';  // 수요 급등 — 비재고 전환 보류
+      return 'to-non';
+    }
+    if (m > 2.0) return 'watch';    // avg6 > 10이지만 수요 급등 — 모니터링
     return 'ok';
   }
   if (r.상태 === '비재고') {
     if (r.avg6 > 10) return 'to-stock';
     if (r.peak > 12 || (r.peak > 12 && r.avg6 > 8) || 트렌드) return 'watch';
+    if (m > 1.5) return 'watch';    // 수요 급등 — 재고 전환 사전 감지
     return 'ok';
   }
   return 'ok';
@@ -582,18 +589,18 @@ function buildAllData() {
     const cur = 당월Data[code] || {};
     const 현재고   = parseFloat(cur['현재고'])||0;
     const 당월출고 = parseFloat(cur['당월출고량'])||0;
-    const 입고잔량 = parseFloat(cur['입고잔량(4주)'])||0;
     const 출고잔량 = parseFloat(cur['출고잔량(4주)'])||0;
-    const avail    = Math.max(0, 현재고 - 출고잔량 + 입고잔량);
-    const cov      = avg6 > 0 ? avail/avg6 : 0;
     const 실적기준일 = cur['실적기준일']||'';
+    // 주간 평균 수요 대비 출고잔량 비율 (모멘텀 지표)
+    const weeklyAvg = avg6 / 4;
+    const 수요모멘텀 = weeklyAvg > 0 ? 출고잔량 / weeklyAvg : 0;
     const series = (m['시리즈']||'').replace(/^\(.*?\)\s*/, '');
     const rec = {
       code, name: m['단품명']||code, 사이즈: m['사이즈']||'',
       시리즈: series, 공급처: m['공급처']||'', 상태: m['재고구분']||'재고',
       운영등급: m['운영등급']||'', 운영방침: m['운영방침']||'데이터기준',
       운영방침_사유: m['운영방침_사유']||'', avg6, peak, months: l6,
-      당월출고, 현재고, 입고잔량, 출고잔량, avail, cov, 실적기준일, verdict: 'ok'
+      당월출고, 현재고, 출고잔량, 수요모멘텀, 실적기준일, verdict: 'ok'
     };
     rec.verdict = judge(rec);
     return rec;
@@ -662,7 +669,7 @@ function renderItemBlocks(data) {
           <div style="min-width:0;flex:1">
             <div class="ib-code">${r.code}</div>
             <div class="ib-name" title="${r.name}">${r.name}</div>
-            <div class="ib-meta">${r.시리즈} ${r.사이즈} · 평균 ${r.avg6.toFixed(1)}개</div>
+            <div class="ib-meta">${r.시리즈} ${r.사이즈} · 평균 ${r.avg6.toFixed(1)}개${r.수요모멘텀>1.5?" · 🔺수요급등":""}</div>
           </div>
           <div style="flex-shrink:0;text-align:right">
             ${policyBadge}
@@ -887,10 +894,10 @@ function submitHistory() {
 }
 
 function exportCSV() {
-  const h = ['단품구분자','단품명','시리즈','사이즈','운영등급','상태','직전6개월평균','당월출고','피크월','판정','운영방침','운영방침_사유'];
+  const h = ['단품구분자','단품명','시리즈','사이즈','운영등급','상태','직전6개월평균','당월출고','피크월','출고잔량','수요모멘텀','판정','운영방침','운영방침_사유'];
   const rows = allData.map(r => [
     r.code, r.name, r.시리즈, r.사이즈, r.운영등급, r.상태,
-    r.avg6.toFixed(1), r.당월출고, r.peak,
+    r.avg6.toFixed(1), r.당월출고, r.peak, r.출고잔량, r.수요모멘텀.toFixed(2),
     {'to-non':'비재고 전환 권고','to-stock':'재고 전환 권고',watch:'모니터링',ok:'정상'}[r.verdict], r.운영방침, r.운영방침_사유
   ]);
   const csv = '\uFEFF' + [h,...rows].map(x=>x.join(',')).join('\n');
