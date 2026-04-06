@@ -444,9 +444,9 @@ tbody td { padding: 10px 14px; vertical-align: middle; }
           </div>
           <div class="rules-card">
             <div class="info-card-title">판정 기준</div>
-            <div class="rule-item"><div class="rule-ttl" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개 + 수요모멘텀 ≤ 1.5</div></div>
-            <div class="rule-item"><div class="rule-ttl" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 > 10개</div></div>
-            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">비재고: 피크 > 12개, 복합리스크, 트렌드↑, 또는 수요모멘텀 > 1.5<br>재고: avg6 ≤ 10이나 수요모멘텀 > 1.5 (전환 보류) / avg6 > 10이나 수요모멘텀 > 2.0</div></div>
+            <div class="rule-item"><div class="rule-ttl" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개</div></div>
+            <div class="rule-item"><div class="rule-ttl" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 3개월 평균 > 10개</div></div>
+            <div class="rule-item"><div class="rule-ttl" style="color:var(--warn)">모니터링</div><div class="rule-body">비재고: 피크 > 12개, 복합리스크, 트렌드↑, 또는 수요모멘텀 > 1.5</div></div>
           </div>
         </div>
         <div id="list-area">
@@ -519,15 +519,11 @@ function judge(r) {
   const m = r.수요모멘텀 || 0;  // 출고잔량 / (avg6/4)
 
   if (r.상태 === '재고') {
-    if (r.avg6 <= 10) {
-      if (m > 1.5) return 'watch';  // 수요 급등 — 비재고 전환 보류
-      return 'to-non';
-    }
-    if (m > 2.0) return 'watch';    // avg6 > 10이지만 수요 급등 — 모니터링
+    if (r.avg6 <= 10) return 'to-non';
     return 'ok';
   }
   if (r.상태 === '비재고') {
-    if (r.avg6 > 10) return 'to-stock';
+    if (r.avg3 > 10) return 'to-stock';
     if (r.peak > 12 || (r.peak > 12 && r.avg6 > 8) || 트렌드) return 'watch';
     if (m > 1.5) return 'watch';    // 수요 급등 — 재고 전환 사전 감지
     return 'ok';
@@ -584,6 +580,8 @@ function buildAllData() {
   return Object.entries(masterData).map(([code, m]) => {
     const l6 = last6.map(k => parseFloat(m[k])||0);
     const avg6 = l6.length ? l6.reduce((a,b)=>a+b,0)/l6.length : 0;
+    const l3 = l6.slice(-3);
+    const avg3 = l3.length ? l3.reduce((a,b)=>a+b,0)/l3.length : 0;
     const allVals = sortedMonths.map(k => parseFloat(m[k])||0);
     const peak = allVals.length ? Math.max(...allVals) : 0;
     const cur = 당월Data[code] || {};
@@ -894,10 +892,10 @@ function submitHistory() {
 }
 
 function exportCSV() {
-  const h = ['단품구분자','단품명','시리즈','사이즈','운영등급','상태','직전6개월평균','당월출고','피크월','출고잔량','수요모멘텀','판정','운영방침','운영방침_사유'];
+  const h = ['단품구분자','단품명','시리즈','사이즈','운영등급','상태','직전6개월평균','직전3개월평균','당월출고','피크월','출고잔량','수요모멘텀','판정','운영방침','운영방침_사유'];
   const rows = allData.map(r => [
     r.code, r.name, r.시리즈, r.사이즈, r.운영등급, r.상태,
-    r.avg6.toFixed(1), r.당월출고, r.peak, r.출고잔량, r.수요모멘텀.toFixed(2),
+    r.avg6.toFixed(1), r.avg3.toFixed(1), r.당월출고, r.peak, r.출고잔량, r.수요모멘텀.toFixed(2),
     {'to-non':'비재고 전환 권고','to-stock':'재고 전환 권고',watch:'모니터링',ok:'정상'}[r.verdict], r.운영방침, r.운영방침_사유
   ]);
   const csv = '\uFEFF' + [h,...rows].map(x=>x.join(',')).join('\n');
