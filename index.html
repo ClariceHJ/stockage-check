@@ -161,6 +161,14 @@ tbody td{padding:10px 14px;vertical-align:middle}
 .cov-md{color:var(--warn);font-weight:500}
 .spark{display:flex;align-items:flex-end;gap:2px;height:22px}
 .spark span{display:inline-block;border-radius:2px;width:5px}
+/* ── 시리즈×사이즈 매트릭스 ── */
+.series-group{margin-bottom:16px}
+.series-group:last-child{margin-bottom:0}
+.series-group-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sg-name{font-size:12px;font-weight:600;color:var(--text)}
+.sg-summary{font-size:11px;font-family:'JetBrains Mono',monospace}
+.series-group-body{display:flex;flex-direction:column;gap:5px;padding-left:4px;border-left:2px solid var(--border)}
+
 /* ── 시리즈 차트 ── */
 .series-card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:20px 22px}
 .series-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
@@ -284,15 +292,15 @@ tbody td{padding:10px 14px;vertical-align:middle}
           <div class="card-title">판정 기준</div>
           <div class="rule-item">
             <div class="rule-title" style="color:var(--danger)">비재고 전환 권고</div>
-            <div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 8개 + 가용재고 ≤ 5개</div>
+            <div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개</div>
           </div>
           <div class="rule-item">
             <div class="rule-title" style="color:var(--success)">재고 전환 권고</div>
-            <div class="rule-body">비재고 운영 + 직전 6개월 평균 ≥ 12개</div>
+            <div class="rule-body">비재고 운영 + 직전 6개월 평균 > 10개</div>
           </div>
           <div class="rule-item">
             <div class="rule-title" style="color:var(--warn)">모니터링</div>
-            <div class="rule-body">경계 구간(8~10개) 또는 비재고 피크월 ≥ 15개</div>
+            <div class="rule-body">재고: 트렌드↑ / 비재고: 피크월 > 12개 또는 복합리스크</div>
           </div>
           <div class="rule-item">
             <div class="rule-title">가용재고</div>
@@ -357,7 +365,7 @@ tbody td{padding:10px 14px;vertical-align:middle}
         <!-- 시리즈별 재고/비재고 현황 -->
         <div class="series-card">
           <div class="series-header">
-            <span class="series-title">시리즈별 재고/비재고 현황</span>
+            <span class="series-title">시리즈 × 사이즈별 재고/비재고 현황</span>
             <div class="series-legend">
               <div class="leg-item"><div class="leg-dot" style="background:var(--accent)"></div>재고</div>
               <div class="leg-item"><div class="leg-dot" style="background:#D1D5DB"></div>비재고</div>
@@ -404,9 +412,9 @@ tbody td{padding:10px 14px;vertical-align:middle}
         </div>
         <div class="rules-card">
           <div class="card-title">판정 기준</div>
-          <div class="rule-item"><div class="rule-title" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 8개 + 가용재고 ≤ 5개</div></div>
-          <div class="rule-item"><div class="rule-title" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 ≥ 12개</div></div>
-          <div class="rule-item"><div class="rule-title" style="color:var(--warn)">모니터링</div><div class="rule-body">경계 구간(8~10개) 또는 비재고 피크월 ≥ 15개</div></div>
+          <div class="rule-item"><div class="rule-title" style="color:var(--danger)">비재고 전환 권고</div><div class="rule-body">재고 운영 + 직전 6개월 평균 ≤ 10개</div></div>
+          <div class="rule-item"><div class="rule-title" style="color:var(--success)">재고 전환 권고</div><div class="rule-body">비재고 운영 + 직전 6개월 평균 > 10개</div></div>
+          <div class="rule-item"><div class="rule-title" style="color:var(--warn)">모니터링</div><div class="rule-body">재고: 트렌드↑ / 비재고: 피크월 > 12개 또는 복합리스크</div></div>
           <div class="rule-item"><div class="rule-title">가용재고</div><div class="rule-body">현재고 − 출고잔량(4주) + 입고잔량(4주)</div></div>
         </div>
       </div>
@@ -465,18 +473,29 @@ tbody td{padding:10px 14px;vertical-align:middle}
 <script>
 const SHEET_ID='1ivNPbJSqoabJhVkrNV68ASADRN_6iAPsWawe54P69Jk';
 const SH={현황:'재고구분_현황',이력:'재고구분_전환이력',당월:'당월실적'};
-const META_COLS=['단품구분자','단품명','시리즈','공급처','재고구분','운영등급','기준일'];
+const META_COLS=['단품구분자','단품명','사이즈','시리즈','공급처','재고구분','운영등급','기준일'];
 const MONTH_RE=/^\d{4}-\d{2}$/;
 
 let masterData={},당월Data={},allData=[],activeFilter='all',pendingRecord=null;
 
 function judge(r){
-  const avail=Math.max(0,r.현재고-r.출고잔량+r.입고잔량);
-  if(r.상태==='재고'  &&r.avg6<=8 &&avail<=5)return'to-non';
-  if(r.상태==='비재고'&&r.avg6>=12)           return'to-stock';
-  if(r.상태==='재고'  &&r.avg6>8  &&r.avg6<10) return'watch';
-  if(r.상태==='재고'  &&r.avg6<=8 &&avail>5)  return'watch';
-  if(r.상태==='비재고'&&r.peak>=15)            return'watch';
+  // 트렌드↑: 최근 3개월(l6 후반부) 평균이 이전 3개월보다 높음
+  const 전반=r.months.slice(0,3); const 후반=r.months.slice(3,6);
+  const avg전=전반.length?전반.reduce((a,b)=>a+b,0)/전반.length:0;
+  const avg후=후반.length?후반.reduce((a,b)=>a+b,0)/후반.length:0;
+  const 트렌드상승=avg후>avg전*1.2&&avg후>3;
+
+  if(r.상태==='재고'){
+    if(r.avg6<=10)return'to-non';            // 비재고 전환 권고
+    if(트렌드상승)return'watch';              // 트렌드↑ 모니터링
+    return'ok';
+  }
+  if(r.상태==='비재고'){
+    if(r.avg6>10)return'to-stock';           // 재고 전환 권고
+    if(r.peak>12&&r.avg6>8)return'watch';   // 복합리스크 모니터링
+    if(r.peak>12)return'watch';              // 피크>12 모니터링
+    return'ok';
+  }
   return'ok';
 }
 
@@ -526,7 +545,7 @@ function buildAllData(){
     const avail=Math.max(0,현재고-출고잔량+입고잔량);
     const cov=avg6>0?avail/avg6:0;
     const rec={code,name:m['단품명']||code,시리즈:m['시리즈']||'',공급처:m['공급처']||'',
-      상태:m['재고구분']||'재고',운영등급:m['운영등급']||'',기준일:m['기준일']||'',
+      상태:m['재고구분']||'재고',사이즈:m['사이즈']||'',운영등급:m['운영등급']||'',기준일:m['기준일']||'',
       avg6,peak,months:l6vals,당월출고,현재고,입고잔량,출고잔량,avail,cov,실적기준일,verdict:'ok'};
     rec.verdict=judge(rec);return rec;
   });
@@ -582,26 +601,53 @@ function renderAll(){
 function renderSeriesChart(data){
   const el=document.getElementById('series-chart');
   if(!el)return;
-  // 시리즈별 집계
+
+  // 시리즈×사이즈 집계
   const map={};
+  const sizeOrder=['옵션','S','SS','Q','K','KK','LKK'];
   data.forEach(r=>{
-    const s=r.시리즈||'기타';
-    if(!map[s])map[s]={재고:0,비재고:0};
-    map[s][r.상태==='재고'?'재고':'비재고']++;
+    const s=r.시리즈||'기타'; const sz=r.사이즈||'—';
+    if(!map[s])map[s]={};
+    if(!map[s][sz])map[s][sz]={재고:0,비재고:0};
+    map[s][sz][r.상태==='재고'?'재고':'비재고']++;
   });
-  const series=Object.entries(map).sort((a,b)=>((b[1].재고+b[1].비재고)-(a[1].재고+a[1].비재고)));
-  const maxTotal=Math.max(...series.map(([,v])=>v.재고+v.비재고),1);
-  el.innerHTML=series.map(([name,v])=>{
-    const total=v.재고+v.비재고;
-    const wStock=Math.round((v.재고/maxTotal)*100);
-    const wNon=Math.round((v.비재고/maxTotal)*100);
-    return`<div class="sb-row">
-      <div class="sb-label">${name}</div>
-      <div class="sb-track">
-        <div class="sb-seg" style="width:${wStock}%;background:var(--accent-bg);border-right:${v.재고&&v.비재고?'1px solid #e5e7eb':'none'}"></div>
-        <div class="sb-seg" style="width:${wNon}%;background:#E5E7EB"></div>
+
+  const seriesOrder=['아콘','아몬드','버치','아티초크'];
+  const series=Object.keys(map).sort((a,b)=>{
+    const ia=seriesOrder.indexOf(a); const ib=seriesOrder.indexOf(b);
+    return(ia===-1?99:ia)-(ib===-1?99:ib);
+  });
+
+  el.innerHTML=series.map(s=>{
+    const sizes=Object.keys(map[s]).sort((a,b)=>{
+      const ia=sizeOrder.indexOf(a); const ib=sizeOrder.indexOf(b);
+      return(ia===-1?99:ia)-(ib===-1?99:ib);
+    });
+    const allStock=sizes.reduce((sum,sz)=>sum+map[s][sz].재고,0);
+    const allNon=sizes.reduce((sum,sz)=>sum+map[s][sz].비재고,0);
+    const maxTotal=Math.max(...sizes.map(sz=>map[s][sz].재고+map[s][sz].비재고),1);
+
+    const sizeRows=sizes.map(sz=>{
+      const v=map[s][sz];
+      const total=v.재고+v.비재고;
+      const wStock=Math.round((v.재고/maxTotal)*100);
+      const wNon=Math.round((v.비재고/maxTotal)*100);
+      return`<div class="sb-row">
+        <div class="sb-label" style="width:44px;font-size:11px">${sz}</div>
+        <div class="sb-track">
+          <div class="sb-seg" style="width:${wStock}%;background:var(--accent-bg);border-right:${v.재고&&v.비재고?'1px solid #dde2f0':'none'}"></div>
+          <div class="sb-seg" style="width:${wNon}%;background:#E5E7EB"></div>
+        </div>
+        <div class="sb-nums" style="width:52px"><span style="color:var(--accent)">${v.재고}</span><span style="color:#d1d5db"> / </span><span style="color:var(--text3)">${v.비재고}</span></div>
+      </div>`;
+    }).join('');
+
+    return`<div class="series-group">
+      <div class="series-group-header">
+        <span class="sg-name">${s}</span>
+        <span class="sg-summary"><span style="color:var(--accent)">${allStock}</span> / <span style="color:var(--text3)">${allNon}</span></span>
       </div>
-      <div class="sb-nums"><span style="color:var(--accent)">${v.재고}</span> / <span style="color:var(--text3)">${v.비재고}</span></div>
+      <div class="series-group-body">${sizeRows}</div>
     </div>`;
   }).join('');
 }
@@ -614,7 +660,7 @@ function renderBlock(listId,cntId,items){
     <div class="ib-item" onclick="gotoList('${r.verdict}')">
       <div class="ib-code">${r.code}</div>
       <div class="ib-name">${r.name}</div>
-      <div class="ib-meta">${r.시리즈} · 직전6개월평균 ${r.avg6.toFixed(1)}개 · 가용재고 ${r.avail}개</div>
+      <div class="ib-meta">${r.시리즈} ${r.사이즈} · 직전6개월 평균 ${r.avg6.toFixed(1)}개</div>
     </div>`).join('');
 }
 
@@ -649,6 +695,7 @@ function renderList(){
         <td class="mono">${r.code}</td>
         <td style="font-weight:500;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px" title="${r.name}">${r.name}</td>
         <td class="muted">${r.시리즈}</td>
+        <td class="muted">${r.사이즈}</td>
         <td class="muted">${r.운영등급}</td>
         <td><span class="spl spl-${r.상태}">${r.상태}</span></td>
         <td class="${avgC}">${r.avg6.toFixed(1)}</td>
@@ -678,7 +725,7 @@ function renderList(){
       <div class="tbl-scroll">
         <table>
           <thead><tr>
-            <th>단품구분자</th><th>단품명</th><th>시리즈</th><th>운영등급</th><th>상태</th>
+            <th>단품구분자</th><th>단품명</th><th>시리즈</th><th>사이즈</th><th>운영등급</th><th>상태</th>
             <th>직전6개월 평균</th><th>당월출고</th><th>피크월</th>
             <th>현재고</th><th>입고잔량</th><th>출고잔량</th><th>가용재고</th>
             <th>커버리지</th><th>추이(6+당월)</th><th>판정</th>
@@ -723,7 +770,7 @@ function submitHistory(){
 }
 
 function exportCSV(){
-  const h=['단품구분자','단품명','시리즈','운영등급','상태','직전6개월평균','당월출고','피크월','현재고','입고잔량','출고잔량','가용재고','커버리지','판정'];
+  const h=['단품구분자','단품명','시리즈','사이즈','운영등급','상태','직전6개월평균','당월출고','피크월','현재고','입고잔량','출고잔량','가용재고','커버리지','판정'];
   const rows=allData.map(r=>[r.code,r.name,r.시리즈,r.운영등급,r.상태,r.avg6.toFixed(1),r.당월출고,r.peak,r.현재고,r.입고잔량,r.출고잔량,r.avail,r.cov.toFixed(1),{'to-non':'비재고 전환 권고','to-stock':'재고 전환 권고',watch:'모니터링',ok:'정상'}[r.verdict]]);
   const csv='\uFEFF'+[h,...rows].map(x=>x.join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`재고전환판정_${new Date().toISOString().slice(0,10)}.csv`;a.click();
@@ -731,12 +778,12 @@ function exportCSV(){
 
 function loadSample(){
   masterData={
-    'SLFC0110A-NWW':{단품명:'아콘프레임 상판 SS',시리즈:'아콘',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':10,'2025-11':8,'2025-12':11,'2026-01':9,'2026-02':10,'2026-03':7},
-    'SLFC0150A-OCY':{단품명:'아콘프레임 상판 Q',시리즈:'아콘',공급처:'충주1공장',재고구분:'재고',운영등급:'B','2025-10':3,'2025-11':4,'2025-12':2,'2026-01':3,'2026-02':3,'2026-03':4},
-    'SLFE0110A-TL': {단품명:'아몬드 바닥판A SS',시리즈:'아몬드',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':13,'2025-11':10,'2025-12':12,'2026-01':11,'2026-02':14,'2026-03':8},
-    'SLFF0150A-NK': {단품명:'버치 베이스 Q',시리즈:'버치',공급처:'충주1공장',재고구분:'비재고',운영등급:'B','2025-10':4,'2025-11':2,'2025-12':3,'2026-01':5,'2026-02':3,'2026-03':4},
-    'SLFE0165A-TL': {단품명:'아몬드 바닥판A K',시리즈:'아몬드',공급처:'충주1공장',재고구분:'비재고',운영등급:'C','2025-10':5,'2025-11':6,'2025-12':7,'2026-01':5,'2026-02':6,'2026-03':5},
-    'SLFN0110BR1-OCY':{단품명:'아티초크 바닥판B SS',시리즈:'아티초크',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':25,'2025-11':22,'2025-12':28,'2026-01':24,'2026-02':27,'2026-03':26},
+    'SLFC0110A-NWW':{단품명:'아콘프레임 상판 SS',시리즈:'아콘',사이즈:'SS',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':10,'2025-11':8,'2025-12':11,'2026-01':9,'2026-02':10,'2026-03':7},
+    'SLFC0150A-OCY':{단품명:'아콘프레임 상판 Q',시리즈:'아콘',사이즈:'Q',공급처:'충주1공장',재고구분:'재고',운영등급:'B','2025-10':3,'2025-11':4,'2025-12':2,'2026-01':3,'2026-02':3,'2026-03':4},
+    'SLFE0110A-TL': {단품명:'아몬드 바닥판A SS',시리즈:'아몬드',사이즈:'SS',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':13,'2025-11':10,'2025-12':12,'2026-01':11,'2026-02':14,'2026-03':8},
+    'SLFF0150A-NK': {단품명:'버치 베이스 Q',시리즈:'버치',사이즈:'Q',공급처:'충주1공장',재고구분:'비재고',운영등급:'B','2025-10':4,'2025-11':2,'2025-12':3,'2026-01':5,'2026-02':3,'2026-03':4},
+    'SLFE0165A-TL': {단품명:'아몬드 바닥판A K',시리즈:'아몬드',사이즈:'K',공급처:'충주1공장',재고구분:'비재고',운영등급:'C','2025-10':5,'2025-11':6,'2025-12':7,'2026-01':5,'2026-02':6,'2026-03':5},
+    'SLFN0110BR1-OCY':{단품명:'아티초크 바닥판B SS',시리즈:'아티초크',사이즈:'SS',공급처:'충주1공장',재고구분:'재고',운영등급:'A','2025-10':25,'2025-11':22,'2025-12':28,'2026-01':24,'2026-02':27,'2026-03':26},
   };
   당월Data={
     'SLFC0110A-NWW':{현재고:'15','당월출고량':'4','입고잔량(4주)':'5','출고잔량(4주)':'3',실적기준일:'2026-04-06'},
